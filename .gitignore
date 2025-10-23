@@ -1,0 +1,9 @@
+# General gitignore  
+__pycache__/  
+*.py[cod]  
+build/  
+dist/  
+*.egg-info/  
+node_modules/  
+.DS_Store  
+Thumbs.db
