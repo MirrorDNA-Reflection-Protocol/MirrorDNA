@@ -14,6 +14,9 @@ from .memory import MemoryManager
 from .agent_dna import AgentDNAManager
 from .crypto import CryptoUtils
 from .storage import StorageAdapter, JSONFileStorage
+from .reflection import ReflectionEngine, ReflectionType, Reflection
+from .config import ConfigLoader, SecureConfigLoader, ConfigChecksum
+from .timeline import TimelineAnalyzer
 
 __all__ = [
     "validate_schema",
@@ -25,4 +28,11 @@ __all__ = [
     "CryptoUtils",
     "StorageAdapter",
     "JSONFileStorage",
+    "ReflectionEngine",
+    "ReflectionType",
+    "Reflection",
+    "ConfigLoader",
+    "SecureConfigLoader",
+    "ConfigChecksum",
+    "TimelineAnalyzer",
 ]

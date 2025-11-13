@@ -1,0 +1,30 @@
+{
+  "name": "@mirrordna/sdk",
+  "version": "1.0.0",
+  "description": "JavaScript/TypeScript SDK for MirrorDNA protocol",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "test": "jest",
+    "prepublish": "npm run build"
+  },
+  "keywords": [
+    "mirrordna",
+    "identity",
+    "continuity",
+    "memory",
+    "ai-agents"
+  ],
+  "author": "MirrorDNA-Reflection-Protocol",
+  "license": "MIT",
+  "dependencies": {
+    "tweetnacl": "^1.0.3"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "typescript": "^5.0.0",
+    "jest": "^29.0.0",
+    "@types/jest": "^29.0.0"
+  }
+}
