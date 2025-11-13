@@ -1,0 +1,72 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://mirrordna.org/schemas/continuity.schema.json",
+  "title": "MirrorDNA Continuity Schema",
+  "description": "Schema for session tracking and context continuity",
+  "version": "1.0.0",
+  "type": "object",
+  "required": ["session_id", "agent_id", "user_id", "started_at"],
+  "properties": {
+    "session_id": {
+      "type": "string",
+      "pattern": "^sess_[a-z0-9_]{12,}$",
+      "description": "Unique session identifier"
+    },
+    "parent_session_id": {
+      "type": ["string", "null"],
+      "pattern": "^sess_[a-z0-9_]{12,}$",
+      "description": "ID of parent session (null if first session)"
+    },
+    "agent_id": {
+      "type": "string",
+      "pattern": "^mdna_agt_[a-z0-9_]{12,}$",
+      "description": "Agent identity ID"
+    },
+    "user_id": {
+      "type": "string",
+      "pattern": "^mdna_usr_[a-z0-9_]{12,}$",
+      "description": "User identity ID"
+    },
+    "started_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO 8601 timestamp when session started"
+    },
+    "ended_at": {
+      "type": ["string", "null"],
+      "format": "date-time",
+      "description": "ISO 8601 timestamp when session ended"
+    },
+    "context_metadata": {
+      "type": "object",
+      "description": "Context metadata for this session",
+      "properties": {
+        "restored_from": {
+          "type": "string",
+          "description": "Session ID from which context was restored"
+        },
+        "topic": {
+          "type": "string",
+          "description": "Brief topic or context description"
+        },
+        "tags": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Tags for categorization"
+        },
+        "prior_memories_count": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Number of memories restored from prior sessions"
+        },
+        "custom": {
+          "type": "object",
+          "description": "Application-specific context metadata"
+        }
+      }
+    }
+  },
+  "additionalProperties": false
+}

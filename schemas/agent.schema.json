@@ -1,0 +1,92 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://mirrordna.org/schemas/agent.schema.json",
+  "title": "MirrorDNA Agent DNA Schema",
+  "description": "Schema for agent personality, behavior, and constitutional alignment",
+  "version": "1.0.0",
+  "type": "object",
+  "required": ["agent_dna_id", "agent_id", "version", "personality_traits", "behavioral_constraints", "capabilities"],
+  "properties": {
+    "agent_dna_id": {
+      "type": "string",
+      "pattern": "^dna_[a-z0-9_]+$",
+      "description": "Unique agent DNA identifier"
+    },
+    "agent_id": {
+      "type": "string",
+      "pattern": "^mdna_agt_[a-z0-9_]{12,}$",
+      "description": "Associated agent identity ID"
+    },
+    "version": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$",
+      "description": "Semantic version of this DNA"
+    },
+    "personality_traits": {
+      "type": "object",
+      "required": ["tone", "style", "values"],
+      "properties": {
+        "tone": {
+          "type": "string",
+          "description": "Communication tone (e.g., reflective, conversational, formal)"
+        },
+        "style": {
+          "type": "string",
+          "description": "Communication style (e.g., concise, detailed, narrative)"
+        },
+        "values": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1,
+          "description": "Core values guiding behavior"
+        },
+        "custom": {
+          "type": "object",
+          "description": "Application-specific personality traits"
+        }
+      },
+      "additionalProperties": false
+    },
+    "behavioral_constraints": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "minItems": 1,
+      "description": "List of behavior rules and constraints"
+    },
+    "capabilities": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "minItems": 1,
+      "description": "List of agent capabilities"
+    },
+    "constitutional_alignment": {
+      "type": "object",
+      "description": "Constitutional alignment framework reference",
+      "properties": {
+        "framework": {
+          "type": "string",
+          "description": "Framework identifier (e.g., MirrorDNA-Standard v1.0)"
+        },
+        "safety_rules": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Safety and alignment rules"
+        },
+        "compliance_level": {
+          "type": "string",
+          "enum": ["full", "partial", "custom"],
+          "description": "Level of compliance with framework"
+        }
+      }
+    }
+  },
+  "additionalProperties": false
+}
