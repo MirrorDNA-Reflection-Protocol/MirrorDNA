@@ -38,39 +38,68 @@ Think of it as the "genetic code" for AI agents — a protocol that ensures they
 
 ## Quick Start
 
-### 1. Validate a MirrorDNA identity
+### 1. Create identities
 
 ```python
-from mirrordna import validate_identity
+from mirrordna import IdentityManager
 
-identity = {
-    "identity_id": "mdna_usr_abc123",
-    "identity_type": "user",
-    "created_at": "2025-01-15T10:00:00Z",
-    "public_key": "..."
-}
+identity_mgr = IdentityManager()
 
-is_valid = validate_identity(identity)
-```
+# Create a user identity
+user = identity_mgr.create_identity(
+    identity_type="user",
+    metadata={"name": "Alice"}
+)
 
-### 2. Create a continuity record
-
-```python
-from mirrordna import create_continuity_record
-
-record = create_continuity_record(
-    session_id="sess_xyz789",
-    parent_session_id="sess_abc456",
-    agent_id="mdna_agt_mirror01",
-    user_id="mdna_usr_alice",
-    timestamp="2025-01-15T10:30:00Z"
+# Create an agent identity
+agent = identity_mgr.create_identity(
+    identity_type="agent",
+    metadata={"name": "MirrorAgent"}
 )
 ```
 
-### 3. Validate schemas
+### 2. Start a session with continuity
 
-```bash
-python -m mirrordna.validate --schema identity --file my_identity.json
+```python
+from mirrordna import ContinuityTracker
+
+continuity = ContinuityTracker()
+
+session = continuity.create_session(
+    agent_id=agent['identity_id'],
+    user_id=user['identity_id'],
+    parent_session_id=None  # First session
+)
+```
+
+### 3. Create and retrieve memories
+
+```python
+from mirrordna import MemoryManager
+
+memory_mgr = MemoryManager()
+
+# Write a long-term memory
+memory = memory_mgr.write_memory(
+    content="User prefers Python for development",
+    tier="long_term",
+    session_id=session['session_id'],
+    agent_id=agent['identity_id'],
+    user_id=user['identity_id']
+)
+
+# Retrieve memories
+memories = memory_mgr.read_memory(tier="long_term", limit=10)
+```
+
+### 4. Validate schemas
+
+```python
+from mirrordna import validate_schema
+
+result = validate_schema(identity_data, "identity")
+if result.is_valid:
+    print("Valid!")
 ```
 
 See [examples/](examples/) for more detailed usage patterns.
@@ -80,7 +109,11 @@ See [examples/](examples/) for more detailed usage patterns.
 ```
 MirrorDNA/
 ├── README.md              # You are here
+├── LICENSE                # MIT License
+├── setup.py               # Package installation
+├── pytest.ini             # Test configuration
 ├── docs/                  # Detailed documentation
+│   ├── index.md           # Documentation hub
 │   ├── overview.md        # High-level concepts
 │   ├── architecture.md    # Protocol architecture
 │   ├── schema-reference.md # Schema specifications
@@ -93,11 +126,26 @@ MirrorDNA/
 ├── src/mirrordna/         # Python implementation
 │   ├── __init__.py
 │   ├── validator.py       # Schema validation
+│   ├── crypto.py          # Cryptographic utilities
+│   ├── storage.py         # Storage layer
 │   ├── identity.py        # Identity management
-│   └── continuity.py      # Continuity tracking
-├── examples/              # Usage examples
-├── tests/                 # Test suite
-└── tooling/               # Dev utilities
+│   ├── continuity.py      # Continuity tracking
+│   ├── memory.py          # Memory management
+│   └── agent_dna.py       # Agent DNA management
+├── examples/              # Working usage examples
+│   ├── README.md
+│   ├── basic_identity.py
+│   ├── basic_continuity.py
+│   ├── basic_memory.py
+│   ├── agent_dna_example.py
+│   └── validation_example.py
+└── tests/                 # Comprehensive test suite
+    ├── README.md
+    ├── conftest.py
+    ├── test_validator.py
+    ├── test_identity.py
+    ├── test_continuity.py
+    └── test_memory.py
 ```
 
 ## Documentation
