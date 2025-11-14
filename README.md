@@ -160,6 +160,59 @@ timeline.append_event(
 
 See [examples/](examples/) for complete working demos.
 
+## Command Line Usage
+
+MirrorDNA includes a powerful CLI tool for local development and vault management.
+
+### Installation
+
+The CLI is included when you install MirrorDNA:
+
+```bash
+pip install -e .
+```
+
+After installation, the `mirrordna` command is available globally.
+
+### Quick Examples
+
+```bash
+# Create a new vault structure
+mirrordna init-vault ./my-project
+
+# Compute deterministic vault hash
+mirrordna compute-hash ./my-project/vault
+
+# Validate a continuity log
+mirrordna verify-log ./my-project/vault/logs/continuity.json
+
+# Create a reflection
+mirrordna reflect "Completed the authentication feature today"
+```
+
+### Available Commands
+
+- **`mirrordna init-vault [DIR]`** — Create vault structure with sample configs and logs
+- **`mirrordna compute-hash PATH`** — Compute SHA-256 vault state hash (deterministic)
+- **`mirrordna verify-log FILE`** — Validate continuity log format and required fields
+- **`mirrordna reflect "TEXT"`** — Generate reflection and log to `~/.mirrordna/logs/reflect.log`
+
+### Complete CLI Documentation
+
+See [cli/README.md](cli/README.md) for comprehensive CLI documentation including:
+- Detailed command reference
+- Usage examples and workflows
+- Integration patterns
+- Troubleshooting guide
+
+### Running Without Installation
+
+```bash
+# Run as Python module
+python -m cli.main --help
+python -m cli.main init-vault
+```
+
 ## Repository Structure
 
 ```
@@ -191,6 +244,16 @@ MirrorDNA/
 │   ├── timeline.py        # Timeline event management
 │   ├── state_snapshot.py  # State snapshot capture
 │   └── [legacy files]     # SDK abstractions (deprecated)
+│
+├── cli/                   # Command-line interface
+│   ├── main.py            # CLI entry point
+│   ├── commands/          # Command implementations
+│   │   ├── init_vault.py  # Vault scaffolding
+│   │   ├── compute_hash.py # Hash computation
+│   │   ├── verify_log.py  # Log validation
+│   │   └── reflect.py     # Reflection engine
+│   ├── tests/             # CLI test suite
+│   └── README.md          # CLI documentation
 │
 ├── sdk/                   # Language-specific SDKs
 │   └── javascript/        # JavaScript/TypeScript SDK

@@ -21,13 +21,21 @@ setup(
         "Bug Tracker": "https://github.com/MirrorDNA-Reflection-Protocol/MirrorDNA/issues",
         "Documentation": "https://github.com/MirrorDNA-Reflection-Protocol/MirrorDNA/tree/main/docs",
     },
-    package_dir={"": "src"},
-    packages=find_packages(where="src"),
+    packages=find_packages(where="src", include=["mirrordna*"]) +
+             find_packages(include=["cli", "cli.*"]),
+    package_dir={"mirrordna": "src/mirrordna"},
     python_requires=">=3.8",
     install_requires=[
         "jsonschema>=4.0.0",
         "cryptography>=40.0.0",
+        "click>=8.0.0",
+        "PyYAML>=6.0.0",
     ],
+    entry_points={
+        "console_scripts": [
+            "mirrordna=cli.main:cli",
+        ],
+    },
     extras_require={
         "dev": [
             "pytest>=7.0.0",
