@@ -1,5 +1,14 @@
 # Integration Guide
 
+## At a Glance
+
+**Goal:** Add MirrorDNA protocol to your application or platform
+**You'll Learn:** Creating Master Citations, tracking timeline events, capturing state snapshots, verifying checksums
+**Prerequisites:** Python 3.8+ or JavaScript/TypeScript, basic JSON/YAML knowledge
+**Time to First Integration:** 20 minutes
+
+---
+
 ## How to Adopt MirrorDNA
 
 This guide shows how to integrate MirrorDNA protocol into your application, platform, or agent system.

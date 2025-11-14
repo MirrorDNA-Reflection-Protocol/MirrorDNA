@@ -99,7 +99,7 @@ Welcome to the MirrorDNA documentation. This index will help you find what you n
 
 MirrorDNA is part of a larger ecosystem:
 
-- **[Active MirrorOS](https://github.com/MirrorDNA-Reflection-Protocol/ActiveMirrorOS)** — Product-facing "intelligence that remembers"
+- **[ActiveMirrorOS](https://github.com/MirrorDNA-Reflection-Protocol/ActiveMirrorOS)** — Product-facing "intelligence that remembers"
 - **[MirrorDNA-Standard](https://github.com/MirrorDNA-Reflection-Protocol/MirrorDNA-Standard)** — Constitutional spec and compliance tooling
 - **[LingOS](https://github.com/MirrorDNA-Reflection-Protocol/LingOS)** — Language-native OS for reflective dialogue
 - **[AgentDNA](https://github.com/MirrorDNA-Reflection-Protocol/AgentDNA)** — Agent personality and persistence schemas

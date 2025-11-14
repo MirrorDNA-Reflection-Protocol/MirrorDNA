@@ -16,6 +16,16 @@ MirrorDNA is a **protocol**, not a platform or service. It defines data structur
 
 Think of it as the "law of persistence" for AI — a cryptographic foundation ensuring agents can maintain coherent, verifiable identities anywhere.
 
+## Who Is This For?
+
+**AI/ML Engineers** — Building agents that need memory and continuity across sessions. Use MirrorDNA to persist agent state, verify continuity, and enable cross-platform portability.
+
+**Platform Developers** — Creating systems where users or agents maintain persistent identities. Implement MirrorDNA for interoperable identity management and cryptographic state verification.
+
+**Researchers** — Exploring AI identity, continuity, and verification protocols. Study MirrorDNA's protocol design, checksum mechanisms, and portability model.
+
+**Integration Teams** — Adding identity and continuity to existing applications. Use MirrorDNA to augment systems with verifiable persistence without replacing core infrastructure.
+
 ## Core Primitives
 
 ### Master Citation

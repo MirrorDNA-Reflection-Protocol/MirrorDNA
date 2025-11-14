@@ -1,5 +1,14 @@
 # MirrorDNA Architecture
 
+## At a Glance
+
+**Purpose:** Understand how MirrorDNA works internally
+**Key Topics:** 4-layer protocol architecture, checksum verification, timeline tracking, state snapshots
+**Audience:** System architects, protocol implementers
+**Read Time:** 10 minutes
+
+---
+
 ## Protocol Layers
 
 MirrorDNA is structured in four conceptual layers:

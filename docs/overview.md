@@ -1,5 +1,14 @@
 # MirrorDNA Protocol Overview
 
+## At a Glance
+
+**What:** Protocol for AI identity, continuity, and cryptographic state verification
+**Key Primitives:** Master Citations (identity), Timeline (events), State Snapshots (checksum-verified state)
+**Core Benefit:** Persistent, portable, verifiable agent identities across platforms and sessions
+**Read Time:** 5 minutes
+
+---
+
 ## What is MirrorDNA?
 
 MirrorDNA is **the architecture of persistence for AI agents and users**. It defines how identity, memory, and continuity are preserved across sessions, systems, and time.
@@ -59,3 +68,17 @@ Any system can implement MirrorDNA. No central authority controls it.
 5. Verify checksums to prove continuity
 
 See [integration-guide.md](integration-guide.md) for implementation details.
+
+## Part of the MirrorDNA Ecosystem
+
+MirrorDNA is the foundational protocol layer in a larger ecosystem:
+
+- **MirrorDNA** (this protocol) — Identity, continuity, and state verification
+- **[MirrorDNA-Standard](https://github.com/MirrorDNA-Reflection-Protocol/MirrorDNA-Standard)** — Constitutional framework and rights specification
+- **[AgentDNA](https://github.com/MirrorDNA-Reflection-Protocol/AgentDNA)** — Agent personality and behavioral traits (built on MirrorDNA)
+- **[GlyphTrail](https://github.com/MirrorDNA-Reflection-Protocol/GlyphTrail)** — Visual interaction lineage and continuity logs
+- **[BeaconGlyphs](https://github.com/MirrorDNA-Reflection-Protocol/BeaconGlyphs)** — Visual glyph system for interaction markers
+- **[ActiveMirrorOS](https://github.com/MirrorDNA-Reflection-Protocol/ActiveMirrorOS)** — Product implementation using these protocols
+- **[LingOS](https://github.com/MirrorDNA-Reflection-Protocol/LingOS)** — Language-native reflective operating system
+
+Each protocol serves a distinct purpose. MirrorDNA provides the identity and continuity layer that others build upon.

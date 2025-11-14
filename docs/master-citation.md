@@ -1,5 +1,14 @@
 # Master Citation
 
+## At a Glance
+
+**What:** The binding document declaring identity, vault location, and constitutional alignment
+**Schema:** `schema/master_citation.schema.json`
+**Key Fields:** id, version, vault_id, created_at, checksum, constitutional_alignment
+**Read Time:** 8 minutes
+
+---
+
 ## What is a Master Citation?
 
 A Master Citation is **the binding document** that declares:

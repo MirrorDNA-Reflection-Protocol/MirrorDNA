@@ -1,5 +1,14 @@
 # Continuity Model
 
+## At a Glance
+
+**Problem:** How do we prove an AI agent is the same across sessions?
+**Solution:** Unbroken chain of cryptographic checksums linking timeline events and state snapshots
+**Key Concepts:** Timeline as proof, snapshots as anchors, checksum verification
+**Read Time:** 7 minutes
+
+---
+
 ## The Continuity Problem
 
 An AI agent has a conversation. The session ends. Later, another session starts.
