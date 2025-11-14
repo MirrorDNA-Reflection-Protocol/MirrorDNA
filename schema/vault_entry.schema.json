@@ -1,0 +1,85 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://mirrordna.org/schema/vault_entry.schema.json",
+  "title": "MirrorDNA Vault Entry",
+  "description": "Entry in a MirrorDNA vault representing stored state or artifact",
+  "version": "1.0.0",
+  "type": "object",
+  "required": ["id", "vault_id", "path", "type", "created_at", "checksum"],
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^entry_[a-z0-9_]{16,}$",
+      "description": "Unique vault entry identifier"
+    },
+    "vault_id": {
+      "type": "string",
+      "pattern": "^vault_[a-z0-9_]{16,}$",
+      "description": "Parent vault identifier"
+    },
+    "path": {
+      "type": "string",
+      "description": "Logical path within vault"
+    },
+    "type": {
+      "type": "string",
+      "enum": ["identity", "memory", "config", "snapshot", "artifact", "reference"],
+      "description": "Type of vault entry"
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO 8601 timestamp of creation"
+    },
+    "updated_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO 8601 timestamp of last update"
+    },
+    "checksum": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$",
+      "description": "SHA-256 checksum of entry content"
+    },
+    "size_bytes": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "Size of entry content in bytes"
+    },
+    "metadata": {
+      "type": "object",
+      "description": "Entry-specific metadata",
+      "properties": {
+        "content_type": {
+          "type": "string",
+          "description": "MIME type or format identifier"
+        },
+        "compression": {
+          "type": "string",
+          "enum": ["none", "gzip", "brotli"],
+          "description": "Compression algorithm used"
+        },
+        "encryption": {
+          "type": "string",
+          "enum": ["none", "aes256", "xchacha20"],
+          "description": "Encryption algorithm used"
+        }
+      }
+    },
+    "tags": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Classification tags"
+    },
+    "references": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "IDs of related entries or external references"
+    }
+  },
+  "additionalProperties": false
+}

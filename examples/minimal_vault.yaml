@@ -1,0 +1,43 @@
+# Minimal Vault Configuration Example
+# This demonstrates a simple vault setup for MirrorDNA protocol
+
+vault_id: vault_example_main
+version: "1.0.0"
+created_at: "2025-11-14T10:00:00Z"
+
+# Storage backend configuration
+storage:
+  type: filesystem  # filesystem | s3 | database
+  root_path: "./vault_data"
+
+  # File organization
+  structure:
+    citations: "citations/"
+    timelines: "timelines/"
+    snapshots: "snapshots/"
+    artifacts: "artifacts/"
+
+# Vault metadata
+metadata:
+  display_name: Example Vault
+  description: File-based vault for example agent
+  owner_citation: mc_example_agent_001
+
+# Vault policies (optional)
+policies:
+  retention:
+    snapshots:
+      max_count: 100
+      max_age_days: 365
+
+  compression:
+    enabled: false
+    algorithm: gzip  # gzip | brotli | none
+
+  encryption:
+    enabled: false
+    algorithm: aes256  # aes256 | xchacha20 | none
+
+# Entry index (managed by vault, not manually edited)
+# This would typically be in a separate index file
+entries: []

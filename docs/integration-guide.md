@@ -1,514 +1,483 @@
-# MirrorDNA Integration Guide
+# Integration Guide
 
-This guide walks you through integrating MirrorDNA into your application.
+## How to Adopt MirrorDNA
+
+This guide shows how to integrate MirrorDNA protocol into your application, platform, or agent system.
 
 ## Prerequisites
 
-- Python 3.8 or higher
-- Basic understanding of JSON schemas
-- Familiarity with identity and session management concepts
+- Python 3.8+ or JavaScript/TypeScript environment
+- Basic understanding of JSON/YAML formats
+- Familiarity with checksums and data integrity concepts
 
 ## Installation
 
-### Option 1: Install from source
+### Python
 
 ```bash
-git clone https://github.com/MirrorDNA-Reflection-Protocol/MirrorDNA.git
+pip install mirrordna
+```
+
+Or install from source:
+```bash
+git clone https://github.com/MirrorDNA-Reflection-Protocol/MirrorDNA
 cd MirrorDNA
 pip install -e .
 ```
 
-### Option 2: Install as dependency
+### JavaScript/TypeScript
 
 ```bash
-pip install git+https://github.com/MirrorDNA-Reflection-Protocol/MirrorDNA.git
+npm install mirrordna
 ```
 
-## Quick Integration
+## Step 1: Create a Master Citation
 
-### Step 1: Create an Identity
+A Master Citation is the entry point to your MirrorDNA identity.
 
-```python
-from mirrordna import IdentityManager
+### Define the Citation Document
 
-# Initialize the identity manager
-identity_mgr = IdentityManager()
+Create `my_citation.yaml`:
 
-# Create a user identity
-user_identity = identity_mgr.create_identity(
-    identity_type="user",
-    metadata={
-        "name": "Alice",
-        "description": "Primary user account"
-    }
-)
+```yaml
+id: mc_myagent_primary_001
+version: "1.0.0"
+vault_id: vault_myagent_main
+created_at: "2025-11-14T10:00:00Z"
+predecessor: null
+successor: null
 
-print(f"Created user: {user_identity['identity_id']}")
-# Output: Created user: mdna_usr_abc123...
+constitutional_alignment:
+  compliance_level: full
+  framework_version: "1.0"
+  rights_bundle:
+    - memory
+    - continuity
+    - portability
 
-# Save the private key securely (NOT shown in identity record)
-# private_key = user_identity['_private_key']  # Handle with care!
+metadata:
+  display_name: MyAgent
+  description: Primary identity for MyAgent
+  tags:
+    - agent
+    - production
 ```
 
-### Step 2: Create an Agent Identity
+### Compute and Add Checksum
 
 ```python
-# Create an agent identity
-agent_identity = identity_mgr.create_identity(
-    identity_type="agent",
-    metadata={
-        "name": "MirrorAgent",
-        "version": "1.0.0",
-        "description": "Reflective conversation agent"
-    }
-)
+import yaml
+from mirrordna import compute_state_checksum
 
-print(f"Created agent: {agent_identity['identity_id']}")
-# Output: Created agent: mdna_agt_mirror01...
+# Load document
+with open("my_citation.yaml") as f:
+    data = yaml.safe_load(f)
+
+# Remove checksum field if present
+data_without_checksum = {k: v for k, v in data.items() if k != "checksum"}
+
+# Compute checksum
+checksum = compute_state_checksum(data_without_checksum)
+
+# Add to file
+data["checksum"] = checksum
+
+with open("my_citation.yaml", "w") as f:
+    yaml.dump(data, f, sort_keys=False)
 ```
 
-### Step 3: Start a Session
+### Validate the Citation
 
 ```python
-from mirrordna import ContinuityTracker
+from mirrordna import ConfigLoader
 
-# Initialize continuity tracker
-continuity = ContinuityTracker()
+loader = ConfigLoader()
+citation = loader.load_master_citation("my_citation.yaml")
 
-# Create first session (no parent)
-session = continuity.create_session(
-    agent_id=agent_identity['identity_id'],
-    user_id=user_identity['identity_id'],
-    parent_session_id=None  # First session
-)
-
-print(f"Started session: {session['session_id']}")
-# Output: Started session: sess_20250115_100030...
+print(f"Loaded citation: {citation.id}")
+print(f"Vault: {citation.vault_id}")
+print(f"Checksum verified: ✓")
 ```
 
-### Step 4: Create Memories
+## Step 2: Initialize a Timeline
+
+Track continuity through an event timeline.
 
 ```python
-from mirrordna import MemoryManager
+from mirrordna import Timeline
 
-# Initialize memory manager
-memory_mgr = MemoryManager()
+# Create timeline
+timeline = Timeline(timeline_id=citation.id)
 
-# Create a short-term memory (current session)
-short_term = memory_mgr.write_memory(
-    content="User asked about MirrorDNA integration",
-    tier="short_term",
-    session_id=session['session_id'],
-    agent_id=agent_identity['identity_id'],
-    user_id=user_identity['identity_id']
+# Add session start event
+timeline.append_event(
+    event_type="session_start",
+    actor=citation.id,
+    payload={"platform": "MyPlatform", "version": "1.0"}
 )
 
-# Create a long-term memory (persistent fact)
-long_term = memory_mgr.write_memory(
-    content="User prefers Python for backend development",
-    tier="long_term",
-    session_id=session['session_id'],
-    agent_id=agent_identity['identity_id'],
-    user_id=user_identity['identity_id'],
-    metadata={
-        "tags": ["preference", "technology"],
-        "relevance_score": 0.95
-    }
+# Add memory creation event
+timeline.append_event(
+    event_type="memory_created",
+    actor=citation.id,
+    payload={"content": "User preferences loaded"}
 )
 
-print(f"Created {len([short_term, long_term])} memories")
+# Save timeline
+timeline.save_to_file(f"{citation.id}_timeline.json")
 ```
 
-### Step 5: Retrieve Memories
+## Step 3: Capture State Snapshots
+
+Preserve point-in-time state with checksums.
 
 ```python
-# Retrieve all long-term memories for this user
-memories = memory_mgr.read_memory(
-    tier="long_term",
-    filters={"source.user_id": user_identity['identity_id']},
-    limit=10
-)
+from mirrordna import capture_snapshot, save_snapshot
 
-for memory in memories:
-    print(f"- {memory['content']}")
-```
-
-### Step 6: End Session
-
-```python
-# End the session
-ended_session = continuity.end_session(
-    session_id=session['session_id'],
-    final_state={
-        "topic": "MirrorDNA integration",
-        "memories_created": 2,
-        "outcome": "successful"
-    }
-)
-
-print(f"Session ended at: {ended_session['ended_at']}")
-```
-
-### Step 7: Resume with Context
-
-```python
-# Start a new session linked to previous one
-new_session = continuity.create_session(
-    agent_id=agent_identity['identity_id'],
-    user_id=user_identity['identity_id'],
-    parent_session_id=session['session_id']  # Link to previous
-)
-
-# Get context from previous session
-context = continuity.get_context(new_session['session_id'])
-print(f"Restored context: {context}")
-
-# Retrieve relevant memories
-relevant_memories = memory_mgr.search_memory(
-    query="integration preferences",
-    tier="long_term",
-    filters={"source.user_id": user_identity['identity_id']},
-    limit=5
-)
-```
-
-## Advanced Integration
-
-### Custom Storage Backend
-
-MirrorDNA supports custom storage backends:
-
-```python
-from mirrordna import StorageAdapter, IdentityManager
-
-class PostgresStorageAdapter(StorageAdapter):
-    def __init__(self, connection_string):
-        self.conn = psycopg2.connect(connection_string)
-
-    def create(self, collection, record):
-        # Insert into PostgreSQL
-        cursor = self.conn.cursor()
-        cursor.execute(
-            f"INSERT INTO {collection} (id, data) VALUES (%s, %s)",
-            (record['id'], json.dumps(record))
-        )
-        self.conn.commit()
-        return record['id']
-
-    def read(self, collection, record_id):
-        # Retrieve from PostgreSQL
-        cursor = self.conn.cursor()
-        cursor.execute(
-            f"SELECT data FROM {collection} WHERE id = %s",
-            (record_id,)
-        )
-        result = cursor.fetchone()
-        return json.loads(result[0]) if result else None
-
-    # Implement update, delete, query methods...
-
-# Use custom storage
-storage = PostgresStorageAdapter("postgresql://localhost/mirrordna")
-identity_mgr = IdentityManager(storage=storage)
-```
-
-### Agent DNA Definition
-
-```python
-from mirrordna import AgentDNAManager
-
-# Initialize DNA manager
-dna_mgr = AgentDNAManager()
-
-# Define agent personality and constraints
-agent_dna = dna_mgr.create_agent_dna(
-    agent_id=agent_identity['identity_id'],
-    version="1.0.0",
-    personality_traits={
-        "tone": "reflective",
-        "style": "conversational",
-        "values": ["clarity", "honesty", "growth"]
+# Capture current state
+snapshot = capture_snapshot(
+    snapshot_id="snap_session_001",
+    identity_state={
+        "citation_id": citation.id,
+        "created_at": citation.created_at
     },
-    behavioral_constraints=[
-        "Never impersonate users",
-        "Acknowledge uncertainty when present",
-        "Respect user privacy"
-    ],
-    capabilities=[
-        "reflection",
-        "continuity",
-        "memory_management"
-    ],
-    constitutional_alignment={
-        "framework": "MirrorDNA-Standard v1.0",
-        "safety_rules": [
-            "Prioritize user safety",
-            "Maintain transparency"
-        ]
-    }
+    continuity_state={
+        "session_count": 1,
+        "total_events": timeline.get_summary()["total_events"]
+    },
+    vault_state={
+        "vault_id": citation.vault_id,
+        "entry_count": 0
+    },
+    timeline_summary=timeline.get_summary()
 )
 
-print(f"Created Agent DNA: {agent_dna['agent_dna_id']}")
+# Save snapshot
+save_snapshot(snapshot, f"{citation.id}_snapshot_001.json")
+
+print(f"Snapshot checksum: {snapshot.checksum}")
 ```
 
-### Validation
+## Step 4: Restore State on Resumption
+
+Load and verify state when resuming a session.
 
 ```python
-from mirrordna import validate_schema
+from mirrordna import load_snapshot, Timeline
 
-# Validate any MirrorDNA data structure
-identity_data = {
-    "identity_id": "mdna_usr_test123",
-    "identity_type": "user",
-    "created_at": "2025-01-15T10:00:00Z",
-    "public_key": "MCowBQYDK2VwAyEA..."
+# Load previous snapshot
+snapshot = load_snapshot("mc_myagent_primary_001_snapshot_001.json")
+print(f"Restored snapshot: {snapshot.snapshot_id}")
+print(f"Checksum verified: ✓")
+
+# Load timeline
+timeline = Timeline.load_from_file("mc_myagent_primary_001_timeline.json")
+print(f"Timeline events: {len(timeline.events)}")
+
+# Continue timeline
+timeline.append_event(
+    event_type="session_start",
+    actor=citation.id,
+    payload={"resumed_from": snapshot.snapshot_id}
+)
+```
+
+## Step 5: Verify Integrity
+
+Always verify checksums to detect tampering.
+
+```python
+from mirrordna import verify_checksum, load_snapshot
+
+# Load snapshot
+snapshot = load_snapshot("mc_myagent_primary_001_snapshot_001.json")
+
+# Manually verify
+data_without_checksum = {
+    "snapshot_id": snapshot.snapshot_id,
+    "timestamp": snapshot.timestamp,
+    "version": snapshot.version,
+    "identity_state": snapshot.identity_state,
+    "continuity_state": snapshot.continuity_state,
+    "vault_state": snapshot.vault_state,
+    "timeline_summary": snapshot.timeline_summary,
+    "metadata": snapshot.metadata
 }
 
-result = validate_schema(identity_data, "identity")
-
-if result.is_valid:
-    print("✓ Valid identity")
-else:
-    print("✗ Validation errors:")
-    for error in result.errors:
-        print(f"  - {error}")
-```
-
-### Cryptographic Operations
-
-```python
-from mirrordna import CryptoUtils
-
-crypto = CryptoUtils()
-
-# Generate a keypair
-public_key, private_key = crypto.generate_keypair()
-
-# Sign a message
-message = "This is a signed message"
-signature = crypto.sign(message, private_key)
-
-# Verify the signature
-is_valid = crypto.verify(message, signature, public_key)
-print(f"Signature valid: {is_valid}")  # True
-
-# Hash data
-data_hash = crypto.hash({"some": "data"})
-print(f"Hash: {data_hash}")
+is_valid = verify_checksum(data_without_checksum, snapshot.checksum)
+print(f"Integrity check: {'PASS' if is_valid else 'FAIL'}")
 ```
 
 ## Integration Patterns
 
-### Pattern 1: Stateless API Server
+### Pattern 1: Stateless Agent with MirrorDNA Persistence
 
-For stateless APIs that need to restore context per request:
-
-```python
-# In your API endpoint
-@app.post("/chat")
-def chat_endpoint(user_id: str, message: str, session_id: str = None):
-    # Get or create session
-    if session_id:
-        session = continuity.get_session(session_id)
-    else:
-        session = continuity.create_session(
-            agent_id="mdna_agt_api_assistant",
-            user_id=user_id,
-            parent_session_id=None
-        )
-
-    # Restore relevant memories
-    memories = memory_mgr.read_memory(
-        tier="long_term",
-        filters={"source.user_id": user_id},
-        limit=10
-    )
-
-    # Process message with context...
-    response = process_chat(message, memories)
-
-    # Save new memories
-    memory_mgr.write_memory(
-        content=f"User said: {message}",
-        tier="short_term",
-        session_id=session['session_id'],
-        agent_id=session['agent_id'],
-        user_id=user_id
-    )
-
-    return {"response": response, "session_id": session['session_id']}
-```
-
-### Pattern 2: Long-Running Agent Process
-
-For agents that run continuously:
+For agents that don't maintain in-memory state between runs.
 
 ```python
-class MirrorAgent:
-    def __init__(self, agent_id, storage):
-        self.agent_id = agent_id
-        self.identity_mgr = IdentityManager(storage)
-        self.continuity = ContinuityTracker(storage)
-        self.memory_mgr = MemoryManager(storage)
-        self.current_session = None
+# On agent start
+loader = ConfigLoader()
+citation = loader.load_master_citation("agent_citation.yaml")
+snapshot = load_snapshot(f"{citation.id}_latest.json")
+timeline = Timeline.load_from_file(f"{citation.id}_timeline.json")
 
-    def start_conversation(self, user_id, parent_session_id=None):
-        self.current_session = self.continuity.create_session(
-            agent_id=self.agent_id,
-            user_id=user_id,
-            parent_session_id=parent_session_id
-        )
+# Restore state from snapshot
+agent_state = snapshot.identity_state
+session_count = snapshot.continuity_state["session_count"]
 
-        # Restore context
-        if parent_session_id:
-            context = self.continuity.get_context(self.current_session['session_id'])
-            self.restore_context(context)
+# Do work...
+timeline.append_event("memory_created", citation.id)
 
-    def process_message(self, message):
-        # Retrieve relevant memories
-        memories = self.memory_mgr.search_memory(
-            query=message,
-            tier="long_term",
-            filters={"source.agent_id": self.agent_id}
-        )
-
-        # Generate response with context
-        response = self.generate_response(message, memories)
-
-        # Save interaction
-        self.memory_mgr.write_memory(
-            content=f"User: {message}\nAgent: {response}",
-            tier="episodic",
-            session_id=self.current_session['session_id'],
-            agent_id=self.agent_id,
-            user_id=self.current_session['user_id']
-        )
-
-        return response
-
-    def end_conversation(self):
-        self.continuity.end_session(
-            session_id=self.current_session['session_id'],
-            final_state={"status": "completed"}
-        )
+# On agent stop
+new_snapshot = capture_snapshot(
+    snapshot_id=f"snap_session_{session_count + 1}",
+    identity_state=agent_state,
+    continuity_state={"session_count": session_count + 1}
+)
+save_snapshot(new_snapshot, f"{citation.id}_latest.json")
+timeline.save_to_file(f"{citation.id}_timeline.json")
 ```
 
-### Pattern 3: Multi-Agent System
+### Pattern 2: Multi-User Platform
 
-For systems with multiple agents:
+For platforms managing multiple identities.
 
 ```python
-class MultiAgentSystem:
-    def __init__(self, storage):
-        self.storage = storage
-        self.agents = {}
+from pathlib import Path
 
-    def register_agent(self, agent_identity, agent_dna):
-        agent = MirrorAgent(agent_identity['identity_id'], self.storage)
-        self.agents[agent_identity['identity_id']] = agent
-        return agent
+class MirrorDNAPlatform:
+    def __init__(self, vault_root: Path):
+        self.vault_root = vault_root
+        self.loader = ConfigLoader()
 
-    def coordinate(self, user_id, task):
-        # Create shared session for coordination
-        session = continuity.create_session(
-            agent_id="mdna_sys_coordinator",
-            user_id=user_id,
-            parent_session_id=None
-        )
+    def get_user_citation(self, user_id: str):
+        citation_path = self.vault_root / f"{user_id}_citation.yaml"
+        return self.loader.load_master_citation(citation_path)
 
-        # Each agent contributes
-        results = {}
-        for agent_id, agent in self.agents.items():
-            agent.start_conversation(user_id, parent_session_id=session['session_id'])
-            results[agent_id] = agent.process_message(task)
-            agent.end_conversation()
+    def get_user_timeline(self, user_id: str):
+        timeline_path = self.vault_root / f"{user_id}_timeline.json"
+        return Timeline.load_from_file(timeline_path)
 
-        return results
+    def create_user_session(self, user_id: str):
+        citation = self.get_user_citation(user_id)
+        timeline = self.get_user_timeline(user_id)
+
+        timeline.append_event("session_start", citation.id)
+        return {"citation": citation, "timeline": timeline}
 ```
 
-## Testing Your Integration
+### Pattern 3: Cross-Platform Identity
+
+For identities that move between platforms.
 
 ```python
-import pytest
-from mirrordna import IdentityManager, ContinuityTracker, MemoryManager
+# Export from Platform A
+snapshot_a = capture_snapshot(
+    snapshot_id="snap_final_platform_a",
+    identity_state=current_state,
+    continuity_state={"sessions_on_platform_a": 100},
+    metadata={"exported_from": "platform_a"}
+)
+save_snapshot(snapshot_a, "export_snapshot.json")
 
-def test_full_workflow():
-    # Setup
-    identity_mgr = IdentityManager()
-    continuity = ContinuityTracker()
-    memory_mgr = MemoryManager()
+# Import to Platform B
+snapshot_a = load_snapshot("export_snapshot.json")
+print(f"Checksum verified from Platform A: ✓")
 
-    # Create identities
-    user = identity_mgr.create_identity("user", {"name": "Test User"})
-    agent = identity_mgr.create_identity("agent", {"name": "Test Agent"})
-
-    # Create session
-    session = continuity.create_session(
-        agent_id=agent['identity_id'],
-        user_id=user['identity_id']
-    )
-
-    # Write and read memory
-    memory = memory_mgr.write_memory(
-        content="Test memory",
-        tier="short_term",
-        session_id=session['session_id'],
-        agent_id=agent['identity_id'],
-        user_id=user['identity_id']
-    )
-
-    retrieved = memory_mgr.read_memory(
-        tier="short_term",
-        filters={"memory_id": memory['memory_id']}
-    )
-
-    assert len(retrieved) == 1
-    assert retrieved[0]['content'] == "Test memory"
-
-    # End session
-    ended = continuity.end_session(session['session_id'])
-    assert ended['ended_at'] is not None
+snapshot_b = capture_snapshot(
+    snapshot_id="snap_initial_platform_b",
+    identity_state=snapshot_a.identity_state,
+    continuity_state={
+        "sessions_on_platform_a": 100,
+        "sessions_on_platform_b": 0
+    },
+    metadata={
+        "imported_from": "platform_a",
+        "previous_snapshot": snapshot_a.snapshot_id,
+        "previous_checksum": snapshot_a.checksum
+    }
+)
+save_snapshot(snapshot_b, "platform_b_initial.json")
 ```
+
+## Vault Storage
+
+### File-Based Vault (Simplest)
+
+```
+vault_root/
+├── citations/
+│   └── mc_myagent_primary_001.yaml
+├── timelines/
+│   └── mc_myagent_primary_001_timeline.json
+├── snapshots/
+│   ├── snap_session_001.json
+│   ├── snap_session_002.json
+│   └── snap_latest.json
+└── artifacts/
+    └── custom_data.bin
+```
+
+### Database-Backed Vault
+
+```python
+import json
+from pathlib import Path
+from dataclasses import asdict
+
+class DatabaseVault:
+    def __init__(self, db_connection):
+        self.db = db_connection
+
+    def store_snapshot(self, snapshot):
+        self.db.execute("""
+            INSERT INTO snapshots (snapshot_id, checksum, data, created_at)
+            VALUES (?, ?, ?, ?)
+        """, (
+            snapshot.snapshot_id,
+            snapshot.checksum,
+            json.dumps(asdict(snapshot)),
+            snapshot.timestamp
+        ))
+
+    def load_snapshot(self, snapshot_id):
+        row = self.db.execute(
+            "SELECT data FROM snapshots WHERE snapshot_id = ?",
+            (snapshot_id,)
+        ).fetchone()
+
+        data = json.loads(row[0])
+        from mirrordna import StateSnapshot
+        return StateSnapshot(**data)
+```
+
+## Schema Validation
+
+### Validate Master Citation
+
+```python
+import json
+import yaml
+import jsonschema
+
+# Load schema
+with open("schema/master_citation.schema.json") as f:
+    schema = json.load(f)
+
+# Load citation
+with open("my_citation.yaml") as f:
+    citation_data = yaml.safe_load(f)
+
+# Validate
+try:
+    jsonschema.validate(citation_data, schema)
+    print("Citation is valid ✓")
+except jsonschema.ValidationError as e:
+    print(f"Validation error: {e.message}")
+```
+
+### Validate Timeline Event
+
+```python
+# Load event schema
+with open("schema/timeline_event.schema.json") as f:
+    event_schema = json.load(f)
+
+# Create event data
+event_data = {
+    "id": "evt_20251114_0001",
+    "timestamp": "2025-11-14T10:00:00Z",
+    "event_type": "session_start",
+    "actor": "mc_myagent_primary_001"
+}
+
+# Validate
+jsonschema.validate(event_data, event_schema)
+```
+
+## Best Practices
+
+### 1. Always Verify Checksums
+
+```python
+# Good
+snapshot = load_snapshot("snapshot.json")  # Automatically verifies
+
+# Also good (manual verification)
+is_valid = verify_checksum(data, expected_checksum)
+if not is_valid:
+    raise ValueError("Checksum mismatch!")
+```
+
+### 2. Snapshot Frequently
+
+Capture snapshots at key moments:
+- Session end
+- After significant state changes
+- Before/after migrations
+- On critical errors (for recovery)
+
+### 3. Maintain Timeline Continuity
+
+```python
+# Link sessions explicitly
+timeline.append_event(
+    "session_start",
+    actor=citation.id,
+    payload={"previous_session": "sess_042"}
+)
+```
+
+### 4. Use Consistent ID Patterns
+
+```
+Master Citations:  mc_{name}_{variant}_{version}
+Vaults:           vault_{name}_{purpose}
+Snapshots:        snap_{description}_{timestamp}
+Events:           evt_{timestamp}_{counter}
+```
+
+### 5. Store Redundantly
+
+Keep multiple copies:
+- Local filesystem
+- Remote backup (S3, etc.)
+- Git repository (for version control)
 
 ## Troubleshooting
 
-### Common Issues
+### Checksum Mismatch
 
-**Issue:** Validation fails with "Invalid identity_id format"
+**Problem**: `ValueError: Snapshot checksum mismatch`
 
-**Solution:** Ensure your ID matches the pattern `mdna_{type}_{suffix}` with at least 12 characters in the suffix.
+**Cause**: File was modified after checksum was computed
 
----
+**Solution**: Recompute checksum or restore from backup
 
-**Issue:** Cannot find schema files
+### Timeline Not Found
 
-**Solution:** Make sure you've installed MirrorDNA properly and that `schemas/` directory is accessible.
+**Problem**: `FileNotFoundError: Timeline file not found`
 
----
+**Cause**: Timeline file was deleted or moved
 
-**Issue:** Session lineage breaks
+**Solution**: Create new timeline or restore from backup
 
-**Solution:** Verify that `parent_session_id` exists before creating child session. Use `continuity.session_exists(session_id)` to check.
+### Invalid Schema
 
----
+**Problem**: `jsonschema.ValidationError: 'id' is a required property`
 
-**Issue:** Memory retrieval is slow
+**Cause**: Master Citation missing required field
 
-**Solution:** Add indexes to your storage backend on common query fields like `user_id`, `agent_id`, `tier`, and `timestamp`.
+**Solution**: Add missing field and recompute checksum
 
 ## Next Steps
 
-- Explore **[examples/](../examples/)** for complete working examples
-- Read **[Schema Reference](schema-reference.md)** for detailed field specs
-- Check **[Architecture](architecture.md)** to understand internal design
-- Review tests in **[tests/](../tests/)** for usage patterns
+- Read [continuity-model.md](continuity-model.md) to understand how continuity works
+- See [master-citation.md](master-citation.md) for Master Citation details
+- Check [glossary.md](glossary.md) for term definitions
+- Explore [examples/](../examples/) for working code samples
 
-## Getting Help
+## Support
 
-- Open an issue in the GitHub repository
-- Check existing documentation in **[docs/](../docs/)**
-- Review example code in **[examples/](../examples/)**
-
----
-
-**MirrorDNA** — The architecture of persistence.
+- GitHub Issues: https://github.com/MirrorDNA-Reflection-Protocol/MirrorDNA/issues
+- Documentation: https://github.com/MirrorDNA-Reflection-Protocol/MirrorDNA/tree/main/docs

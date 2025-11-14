@@ -1,0 +1,71 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://mirrordna.org/schema/master_citation.schema.json",
+  "title": "MirrorDNA Master Citation",
+  "description": "Master Citation document binding identity, continuity, and constitutional alignment",
+  "version": "1.0.0",
+  "type": "object",
+  "required": ["id", "version", "vault_id", "created_at", "checksum"],
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^mc_[a-z0-9_]{16,}$",
+      "description": "Unique master citation identifier"
+    },
+    "version": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$",
+      "description": "Semantic version of this citation"
+    },
+    "vault_id": {
+      "type": "string",
+      "pattern": "^vault_[a-z0-9_]{16,}$",
+      "description": "Associated vault identifier"
+    },
+    "predecessor": {
+      "type": ["string", "null"],
+      "pattern": "^mc_[a-z0-9_]{16,}$",
+      "description": "Previous master citation ID in lineage"
+    },
+    "successor": {
+      "type": ["string", "null"],
+      "pattern": "^mc_[a-z0-9_]{16,}$",
+      "description": "Next master citation ID in lineage"
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO 8601 timestamp of creation"
+    },
+    "updated_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO 8601 timestamp of last update"
+    },
+    "checksum": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$",
+      "description": "SHA-256 checksum of citation content"
+    },
+    "identity_ref": {
+      "type": "string",
+      "description": "Reference to primary identity"
+    },
+    "constitutional_ref": {
+      "type": "string",
+      "description": "Reference to constitutional document (MirrorDNA-Standard)"
+    },
+    "tags": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Classification tags"
+    },
+    "metadata": {
+      "type": "object",
+      "description": "Additional citation metadata"
+    }
+  },
+  "additionalProperties": false
+}

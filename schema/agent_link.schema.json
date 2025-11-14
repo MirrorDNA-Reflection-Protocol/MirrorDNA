@@ -1,0 +1,71 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://mirrordna.org/schema/agent_link.schema.json",
+  "title": "MirrorDNA Agent Link",
+  "description": "Link between MirrorDNA identity and AgentDNA traits",
+  "version": "1.0.0",
+  "type": "object",
+  "required": ["agent_id", "agent_name", "mirrordna_identity_id"],
+  "properties": {
+    "agent_id": {
+      "type": "string",
+      "pattern": "^mdna_agt_[a-z0-9_]{12,}$",
+      "description": "MirrorDNA agent identity identifier"
+    },
+    "agent_name": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Human-readable agent name"
+    },
+    "mirrordna_identity_id": {
+      "type": "string",
+      "description": "Reference to MirrorDNA identity record"
+    },
+    "traits_ref": {
+      "type": "string",
+      "description": "Reference to AgentDNA traits definition (URI or vault path)"
+    },
+    "constitutional_alignment": {
+      "type": "object",
+      "description": "Constitutional alignment metadata",
+      "properties": {
+        "framework": {
+          "type": "string",
+          "description": "Constitutional framework identifier"
+        },
+        "compliance_level": {
+          "type": "string",
+          "enum": ["full", "partial", "custom", "none"],
+          "description": "Level of constitutional compliance"
+        },
+        "verified_at": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Timestamp of last verification"
+        }
+      }
+    },
+    "capabilities": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "List of agent capabilities"
+    },
+    "version": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$",
+      "description": "Agent version (semantic versioning)"
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO 8601 timestamp of link creation"
+    },
+    "metadata": {
+      "type": "object",
+      "description": "Additional agent link metadata"
+    }
+  },
+  "additionalProperties": false
+}

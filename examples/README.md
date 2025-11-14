@@ -23,7 +23,9 @@ python examples/validation_example.py
 
 ## Example Descriptions
 
-### basic_identity.py
+### Core Protocol Examples
+
+#### basic_identity.py
 
 **Purpose:** Demonstrates identity creation, retrieval, signing, and verification.
 
@@ -37,7 +39,7 @@ python examples/validation_example.py
 
 ---
 
-### basic_continuity.py
+#### basic_continuity.py
 
 **Purpose:** Shows session continuity and lineage tracking.
 
@@ -52,7 +54,7 @@ python examples/validation_example.py
 
 ---
 
-### basic_memory.py
+#### basic_memory.py
 
 **Purpose:** Covers memory management across three tiers.
 
@@ -67,7 +69,7 @@ python examples/validation_example.py
 
 ---
 
-### agent_dna_example.py
+#### agent_dna_example.py
 
 **Purpose:** Demonstrates agent DNA definition and versioning.
 
@@ -82,7 +84,7 @@ python examples/validation_example.py
 
 ---
 
-### validation_example.py
+#### validation_example.py
 
 **Purpose:** Explains schema validation for all MirrorDNA data types.
 
@@ -94,6 +96,54 @@ python examples/validation_example.py
 - Understanding validation errors
 
 **Output:** Demonstrates both valid and invalid data structures.
+
+---
+
+### Advanced Features Examples
+
+#### reflection_engine_example.py
+
+**Purpose:** Demonstrates agent introspection and meta-cognition.
+
+**Key concepts:**
+- Reflecting on decisions with rationale
+- Tracking capability usage and performance
+- State introspection and monitoring
+- Meta-reflection (reflecting on reflections)
+- Capability introspection
+
+**Output:** Shows how agents can maintain self-awareness and track their own performance.
+
+---
+
+#### config_loader_example.py
+
+**Purpose:** Shows verified configuration loading with checksums.
+
+**Key concepts:**
+- Saving configurations with integrity hashes
+- Loading and verifying configurations
+- Checksum algorithms (SHA-256, SHA-512)
+- Secure config loading with whitelists
+- Tamper detection
+
+**Output:** Demonstrates how to ensure configuration integrity and prevent tampering.
+
+---
+
+#### timeline_analyzer_example.py
+
+**Purpose:** Advanced lineage analysis and timeline querying.
+
+**Key concepts:**
+- Building complete lineage trees
+- Detecting session branches
+- Tracking context evolution
+- Finding related sessions
+- Calculating session metrics
+- Temporal analysis
+
+**Output:** Shows powerful timeline and relationship analysis capabilities.
 
 ---
 
