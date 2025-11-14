@@ -323,6 +323,145 @@ All tests validate protocol behavior, not implementation details.
 - Verifiable history via timeline
 - Data sovereignty (own your identity and state)
 
+## Developer SDK
+
+**Quick-start toolkit for integrating MirrorDNA concepts** — Simple SDKs in Python and JavaScript for developers who want to get started quickly without the full protocol implementation.
+
+### What's in the SDK?
+
+The `/sdk/` directory provides **lightweight client libraries** and **working examples** in both Python and JavaScript:
+
+- ✅ **Simple API** - High-level methods for common tasks
+- ✅ **Local-first** - Works with files, no backend required
+- ✅ **Educational** - Great for learning MirrorDNA concepts
+- ✅ **Minimal deps** - Easy to install and use
+
+### Python SDK
+
+```bash
+# Quick start
+cd sdk/python/examples
+python basic_usage.py
+```
+
+**Features**:
+- Load and validate vault configurations
+- Compute deterministic state hashes (SHA-256)
+- Create and validate timeline events
+- Track continuity metrics
+- Create Master Citations
+
+**Example**:
+```python
+from mirror_dna_client import MirrorDNAClient
+
+# Initialize client
+client = MirrorDNAClient()
+
+# Create Master Citation
+citation = client.create_master_citation(
+    identity_id="agent_001",
+    vault_id="vault_main"
+)
+
+# Compute state hash
+data = {"user": "alice", "preferences": {...}}
+hash_value = client.compute_state_hash(data)
+
+# Create timeline event
+event = client.create_timeline_event(
+    event_type="session_start",
+    actor=citation['id']
+)
+
+# Check continuity status
+status = client.get_continuity_status(citation['id'])
+print(f"Status: {status['status']}, Events: {status['total_events']}")
+```
+
+See [sdk/python/README.md](sdk/python/README.md) for complete documentation.
+
+### JavaScript SDK
+
+```bash
+# Quick start
+cd sdk/javascript/examples
+npm install
+node basic_usage.js
+```
+
+**Features**:
+- Same capabilities as Python SDK
+- Node.js and browser compatible
+- Simple, standalone client
+
+**Example**:
+```javascript
+const MirrorDNAClient = require('./mirror_dna_client');
+
+// Initialize client
+const client = new MirrorDNAClient();
+
+// Create Master Citation
+const citation = client.createMasterCitation(
+    'agent_001',
+    'vault_main'
+);
+
+// Compute state hash
+const data = {user: 'alice', preferences: {...}};
+const hash = client.computeStateHash(data);
+
+// Create timeline event
+const event = client.createTimelineEvent(
+    'session_start',
+    citation.id
+);
+
+// Check continuity status
+const status = client.getContinuityStatus(citation.id);
+console.log(`Status: ${status.status}, Events: ${status.total_events}`);
+```
+
+See [sdk/javascript/README.md](sdk/javascript/README.md) (coming soon) for complete documentation.
+
+### SDK Documentation
+
+Complete guides in `/sdk/docs/`:
+
+- **[Overview](sdk/docs/overview.md)** - What the SDK is and why to use it
+- **[Python Guide](sdk/docs/python_guide.md)** - Complete Python SDK documentation
+- **[JavaScript Guide](sdk/docs/javascript_guide.md)** - Complete JavaScript SDK documentation
+- **[Design Notes](sdk/docs/design_notes.md)** - Technical design decisions
+
+### SDK vs Full Protocol
+
+```
+┌─────────────────────────────────────┐
+│  SDK Layer (/sdk/)                  │  ← Quick start, educational
+│  - Simple client APIs               │
+│  - Minimal dependencies             │
+│  - Local file operations            │
+├─────────────────────────────────────┤
+│  Protocol Layer (/src/mirrordna/)   │  ← Production-grade
+│  - Schema validation                │
+│  - Full protocol compliance         │
+│  - Advanced features                │
+└─────────────────────────────────────┘
+```
+
+**Use SDK when**:
+- Learning MirrorDNA concepts
+- Prototyping quickly
+- Building simple integrations
+- Educational projects
+
+**Use full protocol when**:
+- Production systems
+- Schema validation required
+- Advanced features needed
+- Full protocol compliance
+
 ## Language SDKs
 
 - **Python** — Reference implementation in `src/mirrordna/`

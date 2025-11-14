@@ -1,0 +1,15 @@
+{
+  "name": "mirrordna-sdk-examples",
+  "version": "1.0.0",
+  "description": "Examples for MirrorDNA JavaScript SDK",
+  "main": "basic_usage.js",
+  "scripts": {
+    "demo": "node basic_usage.js"
+  },
+  "dependencies": {
+    "js-yaml": "^4.1.0"
+  },
+  "engines": {
+    "node": ">=14.0.0"
+  }
+}
