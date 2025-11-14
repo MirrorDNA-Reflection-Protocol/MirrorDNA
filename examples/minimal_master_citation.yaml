@@ -1,0 +1,33 @@
+# Minimal Master Citation Example
+# This is a realistic Master Citation document for MirrorDNA protocol
+
+id: mc_example_agent_001
+version: "1.0.0"
+vault_id: vault_example_main
+created_at: "2025-11-14T10:00:00Z"
+
+# Checksum computed over all fields except this one
+# To compute: python -c "import yaml; from mirrordna import compute_state_checksum; data = yaml.safe_load(open('minimal_master_citation.yaml')); del data['checksum']; print(compute_state_checksum(data))"
+checksum: "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+
+# Lineage (null for initial citation)
+predecessor: null
+successor: null
+
+# Constitutional alignment
+constitutional_alignment:
+  compliance_level: full
+  framework_version: "1.0"
+  rights_bundle:
+    - memory
+    - continuity
+    - portability
+  constraints: []
+
+# Optional metadata
+metadata:
+  display_name: Example Agent
+  description: Minimal example of a MirrorDNA Master Citation
+  tags:
+    - example
+    - agent

@@ -1,38 +1,52 @@
 """
-MirrorDNA - Identity and Continuity Protocol Layer
+MirrorDNA - Identity and Continuity Protocol
 
-MirrorDNA provides a standardized protocol for persistent identity, memory,
-and continuity for AI agents and users.
+The architecture of persistence for AI agents and users.
+
+This package provides the core protocol implementation including:
+- Configuration loading and validation
+- Checksum computation and verification
+- Timeline event management
+- State snapshot capture and serialization
 """
 
 __version__ = "1.0.0"
 
-from .validator import validate_schema, ValidationResult
-from .identity import IdentityManager
-from .continuity import ContinuityTracker
-from .memory import MemoryManager
-from .agent_dna import AgentDNAManager
-from .crypto import CryptoUtils
-from .storage import StorageAdapter, JSONFileStorage
-from .reflection import ReflectionEngine, ReflectionType, Reflection
-from .config import ConfigLoader, SecureConfigLoader, ConfigChecksum
-from .timeline import TimelineAnalyzer
+from .config_loader import ConfigLoader, MasterCitation, VaultConfig
+from .checksum import (
+    compute_file_checksum,
+    compute_state_checksum,
+    compute_text_checksum,
+    verify_checksum
+)
+from .timeline import Timeline, TimelineEvent
+from .state_snapshot import (
+    StateSnapshot,
+    capture_snapshot,
+    serialize_snapshot,
+    save_snapshot,
+    load_snapshot,
+    compare_snapshots
+)
 
 __all__ = [
-    "validate_schema",
-    "ValidationResult",
-    "IdentityManager",
-    "ContinuityTracker",
-    "MemoryManager",
-    "AgentDNAManager",
-    "CryptoUtils",
-    "StorageAdapter",
-    "JSONFileStorage",
-    "ReflectionEngine",
-    "ReflectionType",
-    "Reflection",
+    # Config loading
     "ConfigLoader",
-    "SecureConfigLoader",
-    "ConfigChecksum",
-    "TimelineAnalyzer",
+    "MasterCitation",
+    "VaultConfig",
+    # Checksumming
+    "compute_file_checksum",
+    "compute_state_checksum",
+    "compute_text_checksum",
+    "verify_checksum",
+    # Timeline
+    "Timeline",
+    "TimelineEvent",
+    # State snapshots
+    "StateSnapshot",
+    "capture_snapshot",
+    "serialize_snapshot",
+    "save_snapshot",
+    "load_snapshot",
+    "compare_snapshots",
 ]

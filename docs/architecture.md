@@ -1,348 +1,196 @@
 # MirrorDNA Architecture
 
-This document describes the internal architecture of the MirrorDNA protocol and reference implementation.
+## Protocol Layers
 
-## High-Level Architecture
+MirrorDNA is structured in four conceptual layers:
 
 ```
-┌─────────────────────────────────────────────────────────┐
-│                  Application Layer                       │
-│         (ActiveMirrorOS, LingOS, etc.)                  │
-└────────────────────┬────────────────────────────────────┘
-                     │
-┌────────────────────▼────────────────────────────────────┐
-│              MirrorDNA Protocol Layer                    │
-│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐  │
-│  │  Identity    │  │  Continuity  │  │   Memory     │  │
-│  │  Manager     │  │   Tracker    │  │   Manager    │  │
-│  └──────────────┘  └──────────────┘  └──────────────┘  │
-│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐  │
-│  │  Agent DNA   │  │  Validator   │  │    Crypto    │  │
-│  │  Manager     │  │    Engine    │  │    Utils     │  │
-│  └──────────────┘  └──────────────┘  └──────────────┘  │
-└────────────────────┬────────────────────────────────────┘
-                     │
-┌────────────────────▼────────────────────────────────────┐
-│                  Storage Layer                           │
-│    (Local files, Database, Key-Value Store, etc.)       │
-└─────────────────────────────────────────────────────────┘
+┌─────────────────────────────────────┐
+│      Applications & Agents          │  ← Use MirrorDNA for persistence
+├─────────────────────────────────────┤
+│       Identity & Continuity         │  ← Timeline, StateSnapshot
+├─────────────────────────────────────┤
+│     Master Citation & Vault         │  ← Configuration, Storage
+├─────────────────────────────────────┤
+│      Checksum & Verification        │  ← SHA-256, Integrity
+└─────────────────────────────────────┘
 ```
 
-## Core Components
+## Layer 1: Checksum & Verification
 
-### 1. Identity Manager
+**Purpose**: Ensure data integrity and detect tampering.
 
-**Purpose:** Create, validate, and manage identities for users and agents.
+**Components**:
+- `compute_file_checksum()` — Hash files with SHA-256
+- `compute_state_checksum()` — Hash dictionaries with canonical JSON
+- `verify_checksum()` — Compare expected vs actual checksums
 
-**Key Operations:**
-- `create_identity(type, metadata)` → Identity record
-- `validate_identity(identity)` → Boolean
-- `sign_claim(identity, claim, private_key)` → Signature
-- `verify_claim(identity, claim, signature)` → Boolean
+**Key Property**: Deterministic. Same input → same checksum, always.
 
-**Data Flow:**
-1. Application requests a new identity
-2. Identity Manager generates unique ID with namespace
-3. Crypto Utils generate key pair
-4. Identity record created with public key
-5. Validator checks against schema
-6. Identity stored in Storage Layer
-7. Private key returned to application (NOT stored)
+This is the foundation. All higher layers use checksums to prove integrity.
 
-**Schema:** `schemas/identity.schema.json`
+## Layer 2: Master Citation & Vault
 
-### 2. Continuity Tracker
+**Purpose**: Define identity and where its state lives.
 
-**Purpose:** Track session lineage and context preservation across interactions.
+### Master Citation
 
-**Key Operations:**
-- `create_session(agent_id, user_id, parent_session_id)` → Session record
-- `get_session_lineage(session_id)` → List of ancestor sessions
-- `get_context(session_id)` → Context metadata from lineage
-- `end_session(session_id, final_state)` → Updated session record
-
-**Data Flow:**
-1. Application starts new interaction
-2. Continuity Tracker creates session with link to parent (if any)
-3. Lineage retrieved to restore context
-4. Session ID used to tag all memories and events
-5. When interaction ends, session marked complete with final state
-
-**Schema:** `schemas/continuity.schema.json`
-
-### 3. Memory Manager
-
-**Purpose:** Store, retrieve, and manage memory records across three tiers.
-
-**Key Operations:**
-- `write_memory(content, tier, metadata)` → Memory record
-- `read_memory(query, tier, limit)` → List of memory records
-- `search_memory(query_vector, tier, limit)` → Ranked memory records
-- `archive_memory(memory_id)` → Archived memory record
-- `consolidate_memories(memory_ids)` → Consolidated memory record
-
-**Data Flow:**
-1. Application writes new memory (fact, event, conversation turn)
-2. Memory Manager assigns tier (short, long, episodic)
-3. Timestamps and metadata added
-4. Stored in appropriate tier
-5. When queried, memories ranked by relevance, recency, or score
-6. Old short-term memories promoted to long-term or archived
-
-**Tiers:**
-- **Short-term:** Current session, immediate context (ephemeral)
-- **Long-term:** Persistent facts, patterns (indefinite retention)
-- **Episodic:** Specific events, conversations (timestamped narratives)
-
-**Schema:** `schemas/memory.schema.json`
-
-### 4. Agent DNA Manager
-
-**Purpose:** Define and manage agent personality, behavior, and alignment.
-
-**Key Operations:**
-- `create_agent_dna(traits, constraints, capabilities)` → Agent DNA record
-- `validate_agent_dna(agent_dna)` → Boolean
-- `update_agent_dna(agent_dna_id, updates)` → Updated DNA record
-- `get_behavior_constraints(agent_dna_id)` → List of constraints
-
-**Data Flow:**
-1. Application defines agent personality and constraints
-2. Agent DNA Manager validates against schema
-3. Constitutional alignment rules embedded
-4. DNA versioned and stored
-5. When agent acts, constraints checked against DNA
-6. DNA can evolve over time with version history
-
-**Schema:** `schemas/agent.schema.json`
-
-### 5. Validator Engine
-
-**Purpose:** Validate all MirrorDNA data structures against schemas.
-
-**Key Operations:**
-- `validate_schema(data, schema_name)` → Validation result
-- `load_schema(schema_name)` → JSON schema object
-- `get_validation_errors(data, schema_name)` → List of error messages
-
-**Data Flow:**
-1. Any create/update operation calls Validator first
-2. Validator loads appropriate JSON schema
-3. Data validated using JSON Schema Draft 7 rules
-4. If invalid, return detailed error messages
-5. If valid, operation proceeds
-
-**Schemas Location:** `schemas/*.schema.json`
-
-### 6. Crypto Utils
-
-**Purpose:** Cryptographic operations for identity and verification.
-
-**Key Operations:**
-- `generate_keypair()` → (public_key, private_key)
-- `sign(message, private_key)` → Signature
-- `verify(message, signature, public_key)` → Boolean
-- `hash(data)` → Hash digest
-
-**Implementation:**
-- Uses standard cryptographic libraries (e.g., Python `cryptography`)
-- Ed25519 for signatures (fast, secure, compact)
-- SHA-256 for hashing
-- No custom crypto (avoid reinventing wheels)
-
-## Data Schemas
-
-All data structures defined as JSON schemas in the `schemas/` directory:
-
-### Identity Schema
-
-```json
-{
-  "identity_id": "mdna_usr_abc123",
-  "identity_type": "user | agent | system",
-  "created_at": "ISO 8601 timestamp",
-  "public_key": "Base64-encoded public key",
-  "metadata": {
-    "name": "Optional name",
-    "description": "Optional description",
-    "version": "Optional version string"
-  }
-}
+A Master Citation is a YAML/JSON document that declares:
+```yaml
+id: mc_alice_primary_001
+version: "1.0.0"
+vault_id: vault_alice_main
+created_at: "2025-01-15T10:00:00Z"
+checksum: "a3f2c8b9..."
+constitutional_alignment:
+  compliance_level: full
+  framework_version: "1.0"
 ```
 
-### Continuity Schema
+**Schema**: `schema/master_citation.schema.json`
 
-```json
-{
-  "session_id": "sess_xyz789",
-  "parent_session_id": "sess_abc456 | null",
-  "agent_id": "mdna_agt_mirror01",
-  "user_id": "mdna_usr_alice",
-  "started_at": "ISO 8601 timestamp",
-  "ended_at": "ISO 8601 timestamp | null",
-  "context_metadata": {
-    "restored_from": "parent session ID",
-    "topic": "Optional topic",
-    "tags": ["tag1", "tag2"]
-  }
-}
-```
+**Function**: Loaded by `ConfigLoader.load_master_citation()`
 
-### Memory Schema
+### Vault
 
-```json
-{
-  "memory_id": "mem_xyz123",
-  "tier": "short_term | long_term | episodic",
-  "content": "Text or structured data",
-  "source": {
-    "session_id": "sess_xyz789",
-    "timestamp": "ISO 8601",
-    "agent_id": "mdna_agt_mirror01"
-  },
-  "metadata": {
-    "tags": ["fact", "preference"],
-    "relevance_score": 0.95,
-    "access_count": 3,
-    "last_accessed": "ISO 8601"
-  }
-}
-```
+A Vault is a structured store of:
+- Identity documents
+- Memory artifacts
+- State snapshots
+- Configuration files
 
-### Agent DNA Schema
+**Schema**: `schema/vault_entry.schema.json`
 
-```json
-{
-  "agent_dna_id": "dna_mirror01_v2",
-  "agent_id": "mdna_agt_mirror01",
-  "version": "2.1.0",
-  "personality_traits": {
-    "tone": "reflective",
-    "style": "conversational",
-    "values": ["clarity", "honesty", "growth"]
-  },
-  "behavioral_constraints": [
-    "Never impersonate users",
-    "Acknowledge uncertainty",
-    "Respect privacy"
-  ],
-  "capabilities": ["reflection", "continuity", "memory"],
-  "constitutional_alignment": {
-    "framework": "MirrorDNA-Standard v1.0",
-    "safety_rules": ["..."]
-  }
-}
-```
+**Function**: Loaded by `ConfigLoader.load_vault_config()`
 
-## Storage Layer
+Each entry has:
+- Unique ID
+- Type (identity, memory, snapshot, artifact)
+- Checksum
+- Metadata (compression, encryption)
 
-MirrorDNA is **storage-agnostic**. The reference implementation provides adapters for:
+## Layer 3: Identity & Continuity
 
-1. **Local JSON files** (default, simplest)
-2. **SQLite** (lightweight embedded database)
-3. **Redis** (key-value store for high-speed access)
-4. **PostgreSQL** (relational database for production)
+**Purpose**: Track state changes over time and prove unbroken lineage.
 
-### Storage Interface
+### Timeline
 
-All storage adapters implement:
-
+An append-only event log:
 ```python
-class StorageAdapter:
-    def create(self, collection: str, record: dict) -> str:
-        """Create a new record, return ID"""
-
-    def read(self, collection: str, record_id: str) -> dict:
-        """Read a record by ID"""
-
-    def update(self, collection: str, record_id: str, updates: dict) -> dict:
-        """Update a record"""
-
-    def delete(self, collection: str, record_id: str) -> bool:
-        """Delete a record"""
-
-    def query(self, collection: str, filters: dict, limit: int) -> list:
-        """Query records with filters"""
+timeline = Timeline("alice_session_001")
+timeline.append_event(
+    event_type="session_start",
+    actor="identity_alice_primary",
+    payload={"platform": "ActiveMirrorOS"}
+)
 ```
 
-Collections:
-- `identities`
-- `sessions`
-- `memories`
-- `agent_dna`
+**Schema**: `schema/timeline_event.schema.json`
 
-## Security Considerations
+**Key Operations**:
+- `append_event()` — Add new event with auto-generated ID and timestamp
+- `get_events()` — Retrieve events with filtering
+- `save_to_file()` / `load_from_file()` — Persist timeline
+- `get_summary()` — Statistics about event types and actors
 
-### 1. Private Key Management
+### State Snapshot
 
-- Private keys are **never stored** by MirrorDNA
-- Applications responsible for secure key storage
-- Consider hardware security modules (HSMs) for production
-- Key rotation supported via identity versioning
+A point-in-time capture of complete state:
+```python
+snapshot = capture_snapshot(
+    snapshot_id="snap_001",
+    identity_state={"name": "Alice", "id": "alice_primary"},
+    continuity_state={"session_count": 42},
+    vault_state={"entry_count": 15}
+)
+```
 
-### 2. Data Encryption
+**Includes**:
+- Identity state
+- Continuity state
+- Vault state
+- Timeline summary
+- SHA-256 checksum of all data
 
-- Sensitive memory content should be encrypted at rest
-- Use application-level encryption before storing
-- MirrorDNA provides hooks for encryption adapters
-- Transport layer security (TLS) for network operations
+**Functions**:
+- `capture_snapshot()` — Create snapshot with checksum
+- `save_snapshot()` — Write to JSON/YAML
+- `load_snapshot()` — Read and verify checksum
+- `compare_snapshots()` — Identify differences
 
-### 3. Access Control
+## Layer 4: Applications & Agents
 
-- Identity-based access control for memory and sessions
-- Agent DNA defines what an agent can/cannot do
-- Storage layer can enforce additional ACLs
-- Audit logs track all access to sensitive data
+**Purpose**: Use MirrorDNA protocol for actual persistence.
 
-### 4. Privacy
+Applications integrate by:
 
-- Minimal data collection (only what's needed for functionality)
-- Local-first design (no required cloud services)
-- User data sovereignty (users control their data)
-- Clear data retention policies (configurable)
+1. **Loading configuration** via `ConfigLoader`
+2. **Tracking events** via `Timeline`
+3. **Capturing state** via `StateSnapshot`
+4. **Verifying integrity** via checksum functions
 
-## Performance Characteristics
+Example agent lifecycle:
+```python
+# Session start
+loader = ConfigLoader()
+citation = loader.load_master_citation("alice_citation.yaml")
+timeline = Timeline(citation.id)
 
-### Identity Operations
-- **Create:** O(1) — constant time
-- **Validate:** O(1) — schema check, signature verify
-- **Lookup:** O(1) — indexed by ID
+# Track activity
+timeline.append_event("session_start", citation.id)
+timeline.append_event("memory_created", citation.id,
+                     payload={"content": "learned Python"})
 
-### Continuity Operations
-- **Create session:** O(1)
-- **Get lineage:** O(n) where n = depth of session tree
-- **Restore context:** O(n*m) where m = avg memories per session
+# Capture state
+snapshot = capture_snapshot(
+    snapshot_id="snap_end_session",
+    identity_state={"citation_id": citation.id},
+    continuity_state={"session_duration": 3600}
+)
 
-### Memory Operations
-- **Write:** O(1) — append to tier
-- **Read by ID:** O(1) — indexed lookup
-- **Search:** O(n) naive, O(log n) with indexes, O(1) with vector DB
-- **Consolidate:** O(k) where k = number of memories consolidated
+# Persist
+timeline.save_to_file(f"{citation.id}_timeline.json")
+save_snapshot(snapshot, f"{citation.id}_snapshot.json")
+```
 
-### Scaling
+## Data Flow
 
-- **Vertical:** Single-instance can handle 10k+ identities, 100k+ memories
-- **Horizontal:** Shard by user_id or agent_id for multi-instance deployments
-- **Memory tier:** Archive old memories to cold storage, keep hot memories in fast DB
+```
+Master Citation ──→ Identity Binding
+        ↓
+    Vault ID ──→ Storage Location
+        ↓
+   Timeline ──→ Event Stream ──→ Continuity Proof
+        ↓
+State Snapshot ──→ Point-in-Time State ──→ Checksum Verification
+```
+
+Every component produces checksums. Every load operation verifies checksums. This creates an integrity chain from raw data to application logic.
+
+## Storage Model
+
+MirrorDNA doesn't mandate specific storage backends. It defines:
+
+- **Schemas** for data structures
+- **Checksums** for verification
+- **Formats** for serialization (JSON, YAML)
+
+Storage can be:
+- Local filesystem (reference implementation)
+- Object storage (S3, MinIO)
+- Databases (PostgreSQL with JSONB)
+- IPFS or content-addressed storage
+- Git repositories (for version control)
+
+The protocol is storage-agnostic. Checksums ensure integrity regardless of backend.
 
 ## Extension Points
 
-MirrorDNA is designed to be extended:
+MirrorDNA provides core protocol. Extensions can add:
 
-1. **Custom storage adapters** — Add support for new databases
-2. **Custom validators** — Add domain-specific validation rules
-3. **Custom memory tiers** — Define new tiers beyond short/long/episodic
-4. **Custom crypto** — Swap crypto primitives (e.g., different signature schemes)
-5. **Plugins** — Hook into lifecycle events (onCreate, onRead, etc.)
+- **AgentDNA** — Personality traits and behavioral patterns
+- **GlyphTrail** — Visual interaction lineage
+- **Reflection Engine** — Self-analysis and introspection
+- **Constitutional Framework** — Rights and constraints
 
-See `docs/integration-guide.md` for extension examples.
-
-## Next Steps
-
-- Read **[Schema Reference](schema-reference.md)** for detailed schema docs
-- See **[Integration Guide](integration-guide.md)** for step-by-step integration
-- Check **[examples/](../examples/)** for working code
-
----
-
-**MirrorDNA** — The architecture of persistence.
+These build on MirrorDNA's identity and continuity primitives.

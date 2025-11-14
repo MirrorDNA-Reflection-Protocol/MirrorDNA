@@ -1,368 +1,209 @@
 """
-Enhanced timeline and lineage tracking for MirrorDNA.
+Timeline management for MirrorDNA protocol.
 
-Provides advanced capabilities for:
-- Timeline querying and visualization
-- Lineage analysis and branching
-- Context evolution tracking
-- Session relationships
+Provides in-memory and file-backed timeline for tracking continuity events.
 """
 
-from datetime import datetime, timedelta
-from typing import Dict, List, Any, Optional, Set, Tuple
-from collections import defaultdict
+import json
+from datetime import datetime
+from pathlib import Path
+from typing import Dict, Any, List, Optional, Union
+from dataclasses import dataclass, asdict
 
-from .continuity import ContinuityTracker
-from .storage import StorageAdapter, JSONFileStorage
+
+@dataclass
+class TimelineEvent:
+    """Single event in MirrorDNA timeline."""
+    id: str
+    timestamp: str
+    event_type: str
+    actor: str
+    payload: Optional[Dict[str, Any]] = None
+    related_vault_id: Optional[str] = None
+    related_agent_id: Optional[str] = None
+    related_session_id: Optional[str] = None
+    checksum: Optional[str] = None
+    tags: Optional[List[str]] = None
 
 
-class TimelineAnalyzer:
-    """Advanced timeline and lineage analysis."""
+class Timeline:
+    """MirrorDNA Timeline for continuity tracking."""
 
-    def __init__(
-        self,
-        continuity: Optional[ContinuityTracker] = None,
-        storage: Optional[StorageAdapter] = None
-    ):
+    def __init__(self, timeline_id: str = "default"):
         """
-        Initialize timeline analyzer.
+        Initialize timeline.
 
         Args:
-            continuity: Continuity tracker instance
-            storage: Storage adapter
+            timeline_id: Unique identifier for this timeline
         """
-        self.storage = storage or JSONFileStorage()
-        self.continuity = continuity or ContinuityTracker(self.storage)
+        self.timeline_id = timeline_id
+        self.events: List[TimelineEvent] = []
+        self._event_counter = 0
 
-    async def get_timeline(
+    def _generate_event_id(self) -> str:
+        """Generate unique event ID."""
+        self._event_counter += 1
+        timestamp = datetime.utcnow().strftime("%Y%m%d%H%M%S")
+        return f"evt_{timestamp}_{self._event_counter:04d}"
+
+    def append_event(
         self,
-        user_id: Optional[str] = None,
-        agent_id: Optional[str] = None,
-        start_time: Optional[str] = None,
-        end_time: Optional[str] = None,
-        limit: int = 100
-    ) -> List[Dict[str, Any]]:
+        event_type: str,
+        actor: str,
+        payload: Optional[Dict[str, Any]] = None,
+        **kwargs
+    ) -> TimelineEvent:
         """
-        Get timeline of sessions with optional filters.
+        Append event to timeline.
 
         Args:
-            user_id: Optional filter by user
-            agent_id: Optional filter by agent
-            start_time: Optional start timestamp (ISO 8601)
-            end_time: Optional end timestamp (ISO 8601)
-            limit: Maximum number of sessions
+            event_type: Type of event (session_start, memory_created, etc.)
+            actor: Identity ID of actor triggering event
+            payload: Event-specific data
+            **kwargs: Additional event fields (related_vault_id, etc.)
 
         Returns:
-            List of sessions in chronological order
+            Created TimelineEvent
         """
-        filters = {}
-        if user_id:
-            filters["user_id"] = user_id
-        if agent_id:
-            filters["agent_id"] = agent_id
+        event = TimelineEvent(
+            id=self._generate_event_id(),
+            timestamp=datetime.utcnow().isoformat() + "Z",
+            event_type=event_type,
+            actor=actor,
+            payload=payload or {},
+            **{k: v for k, v in kwargs.items() if k in TimelineEvent.__dataclass_fields__}
+        )
 
-        sessions = await self.storage.query("sessions", filters, limit=limit * 2)
+        self.events.append(event)
+        return event
 
-        # Filter by time range
-        if start_time or end_time:
-            filtered = []
-            for session in sessions:
-                session_time = session.get("started_at", "")
-
-                if start_time and session_time < start_time:
-                    continue
-                if end_time and session_time > end_time:
-                    continue
-
-                filtered.append(session)
-            sessions = filtered
-
-        # Sort by start time
-        sessions.sort(key=lambda s: s.get("started_at", ""))
-
-        return sessions[:limit]
-
-    async def get_lineage_tree(
+    def get_events(
         self,
-        root_session_id: str
-    ) -> Dict[str, Any]:
+        event_type: Optional[str] = None,
+        actor: Optional[str] = None,
+        limit: Optional[int] = None
+    ) -> List[TimelineEvent]:
         """
-        Build complete lineage tree from a root session.
+        Retrieve events with optional filtering.
 
         Args:
-            root_session_id: Starting session ID
+            event_type: Filter by event type
+            actor: Filter by actor
+            limit: Maximum number of events to return
 
         Returns:
-            Tree structure with all descendants
+            List of matching TimelineEvent objects
         """
-        root_session = await self.continuity.get_session(root_session_id)
-        if not root_session:
-            return {}
+        filtered = self.events
 
-        tree = {
-            "session": root_session,
-            "children": []
+        if event_type:
+            filtered = [e for e in filtered if e.event_type == event_type]
+
+        if actor:
+            filtered = [e for e in filtered if e.actor == actor]
+
+        if limit:
+            filtered = filtered[:limit]
+
+        return filtered
+
+    def get_event_by_id(self, event_id: str) -> Optional[TimelineEvent]:
+        """
+        Get specific event by ID.
+
+        Args:
+            event_id: Event identifier
+
+        Returns:
+            TimelineEvent if found, None otherwise
+        """
+        for event in self.events:
+            if event.id == event_id:
+                return event
+        return None
+
+    def export_events(self) -> List[Dict[str, Any]]:
+        """
+        Export all events as dictionaries.
+
+        Returns:
+            List of event dictionaries
+        """
+        return [asdict(event) for event in self.events]
+
+    def save_to_file(self, path: Union[str, Path]) -> None:
+        """
+        Save timeline to JSON file.
+
+        Args:
+            path: File path to save to
+        """
+        path = Path(path)
+
+        timeline_data = {
+            "timeline_id": self.timeline_id,
+            "event_count": len(self.events),
+            "events": self.export_events()
         }
 
-        # Find all sessions that have this as parent
-        all_sessions = await self.storage.query("sessions", {}, limit=10000)
-        children = [
-            s for s in all_sessions
-            if s.get("parent_session_id") == root_session_id
-        ]
+        with open(path, 'w') as f:
+            json.dump(timeline_data, f, indent=2)
 
-        # Recursively build subtrees
-        for child in children:
-            subtree = await self.get_lineage_tree(child["session_id"])
-            tree["children"].append(subtree)
-
-        return tree
-
-    async def detect_branches(
-        self,
-        root_session_id: str
-    ) -> List[List[str]]:
+    @classmethod
+    def load_from_file(cls, path: Union[str, Path]) -> "Timeline":
         """
-        Detect branching points in session lineage.
+        Load timeline from JSON file.
 
         Args:
-            root_session_id: Starting session ID
+            path: File path to load from
 
         Returns:
-            List of branches (each branch is a list of session IDs)
+            Timeline instance
+
+        Raises:
+            FileNotFoundError: If file doesn't exist
         """
-        tree = await self.get_lineage_tree(root_session_id)
+        path = Path(path)
 
-        branches = []
+        if not path.exists():
+            raise FileNotFoundError(f"Timeline file not found: {path}")
 
-        def traverse(node: Dict[str, Any], current_branch: List[str]):
-            current_branch = current_branch + [node["session"]["session_id"]]
+        with open(path, 'r') as f:
+            data = json.load(f)
 
-            children = node.get("children", [])
+        timeline = cls(timeline_id=data.get("timeline_id", "loaded"))
 
-            if not children:
-                # Leaf node - end of branch
-                branches.append(current_branch)
-            elif len(children) == 1:
-                # Single child - continue branch
-                traverse(children[0], current_branch)
-            else:
-                # Multiple children - branching point
-                for child in children:
-                    traverse(child, current_branch)
-
-        if tree:
-            traverse(tree, [])
-
-        return branches
-
-    async def get_context_evolution(
-        self,
-        session_ids: List[str]
-    ) -> List[Dict[str, Any]]:
-        """
-        Track how context evolved across a sequence of sessions.
-
-        Args:
-            session_ids: List of session IDs in order
-
-        Returns:
-            List of context snapshots with diffs
-        """
-        evolution = []
-        prev_context = {}
-
-        for session_id in session_ids:
-            session = await self.continuity.get_session(session_id)
-            if not session:
-                continue
-
-            current_context = session.get("context_metadata", {})
-
-            # Calculate diff from previous
-            added = {
-                k: v for k, v in current_context.items()
-                if k not in prev_context or prev_context[k] != v
-            }
-
-            removed = {
-                k: prev_context[k] for k in prev_context
-                if k not in current_context
-            }
-
-            evolution.append({
-                "session_id": session_id,
-                "started_at": session.get("started_at"),
-                "context": current_context,
-                "diff": {
-                    "added": added,
-                    "removed": removed
-                }
+        for event_data in data.get("events", []):
+            # Create TimelineEvent from loaded data
+            event = TimelineEvent(**{
+                k: v for k, v in event_data.items()
+                if k in TimelineEvent.__dataclass_fields__
             })
+            timeline.events.append(event)
 
-            prev_context = current_context
+        timeline._event_counter = len(timeline.events)
 
-        return evolution
+        return timeline
 
-    async def get_session_metrics(
-        self,
-        user_id: Optional[str] = None,
-        agent_id: Optional[str] = None
-    ) -> Dict[str, Any]:
+    def get_summary(self) -> Dict[str, Any]:
         """
-        Calculate metrics about sessions.
-
-        Args:
-            user_id: Optional filter by user
-            agent_id: Optional filter by agent
+        Get summary statistics about timeline.
 
         Returns:
-            Dictionary of metrics
+            Dictionary with timeline statistics
         """
-        filters = {}
-        if user_id:
-            filters["user_id"] = user_id
-        if agent_id:
-            filters["agent_id"] = agent_id
+        event_types = {}
+        actors = set()
 
-        sessions = await self.storage.query("sessions", filters, limit=10000)
-
-        # Calculate metrics
-        total_sessions = len(sessions)
-        ended_sessions = [s for s in sessions if s.get("ended_at")]
-        active_sessions = [s for s in sessions if not s.get("ended_at")]
-
-        # Session durations
-        durations = []
-        for session in ended_sessions:
-            start = datetime.fromisoformat(session["started_at"].replace("Z", "+00:00"))
-            end = datetime.fromisoformat(session["ended_at"].replace("Z", "+00:00"))
-            duration = (end - start).total_seconds()
-            durations.append(duration)
-
-        avg_duration = sum(durations) / len(durations) if durations else 0
-
-        # Session tree depth
-        max_depth = 0
-        for session in sessions:
-            lineage = await self.continuity.get_session_lineage(session["session_id"])
-            max_depth = max(max_depth, len(lineage))
-
-        # Branching factor
-        parent_counts = defaultdict(int)
-        for session in sessions:
-            parent_id = session.get("parent_session_id")
-            if parent_id:
-                parent_counts[parent_id] += 1
-
-        max_branches = max(parent_counts.values()) if parent_counts else 0
+        for event in self.events:
+            event_types[event.event_type] = event_types.get(event.event_type, 0) + 1
+            actors.add(event.actor)
 
         return {
-            "total_sessions": total_sessions,
-            "active_sessions": len(active_sessions),
-            "ended_sessions": len(ended_sessions),
-            "average_duration_seconds": avg_duration,
-            "max_lineage_depth": max_depth,
-            "max_branching_factor": max_branches,
-            "unique_users": len(set(s.get("user_id") for s in sessions if s.get("user_id"))),
-            "unique_agents": len(set(s.get("agent_id") for s in sessions if s.get("agent_id")))
+            "timeline_id": self.timeline_id,
+            "total_events": len(self.events),
+            "event_types": event_types,
+            "unique_actors": len(actors),
+            "first_event": self.events[0].timestamp if self.events else None,
+            "last_event": self.events[-1].timestamp if self.events else None
         }
-
-    async def find_related_sessions(
-        self,
-        session_id: str,
-        max_distance: int = 2
-    ) -> Dict[str, List[str]]:
-        """
-        Find sessions related to a given session.
-
-        Args:
-            session_id: Starting session ID
-            max_distance: Maximum distance in lineage tree
-
-        Returns:
-            Dictionary of relationship types to session IDs
-        """
-        related = {
-            "ancestors": [],
-            "descendants": [],
-            "siblings": []
-        }
-
-        # Get lineage (ancestors)
-        lineage = await self.continuity.get_session_lineage(session_id)
-        if len(lineage) > 1:
-            related["ancestors"] = [s["session_id"] for s in lineage[:-1]]
-
-        # Get descendants
-        tree = await self.get_lineage_tree(session_id)
-
-        def collect_descendants(node: Dict[str, Any], depth: int = 0):
-            if depth >= max_distance:
-                return
-
-            for child in node.get("children", []):
-                related["descendants"].append(child["session"]["session_id"])
-                collect_descendants(child, depth + 1)
-
-        collect_descendants(tree)
-
-        # Get siblings (sessions with same parent)
-        session = await self.continuity.get_session(session_id)
-        if session and session.get("parent_session_id"):
-            parent_id = session["parent_session_id"]
-            all_sessions = await self.storage.query("sessions", {}, limit=10000)
-            siblings = [
-                s["session_id"] for s in all_sessions
-                if s.get("parent_session_id") == parent_id
-                and s["session_id"] != session_id
-            ]
-            related["siblings"] = siblings
-
-        return related
-
-    async def get_concurrent_sessions(
-        self,
-        time_window: Optional[Tuple[str, str]] = None
-    ) -> List[List[str]]:
-        """
-        Find sessions that overlapped in time.
-
-        Args:
-            time_window: Optional (start, end) tuple to filter
-
-        Returns:
-            List of groups of concurrent session IDs
-        """
-        sessions = await self.storage.query("sessions", {}, limit=10000)
-
-        # Filter by time window if provided
-        if time_window:
-            start, end = time_window
-            sessions = [
-                s for s in sessions
-                if s.get("started_at", "") >= start
-                and s.get("started_at", "") <= end
-            ]
-
-        # Find overlapping sessions
-        concurrent_groups = []
-
-        for i, session_a in enumerate(sessions):
-            group = [session_a["session_id"]]
-
-            start_a = session_a.get("started_at")
-            end_a = session_a.get("ended_at") or datetime.utcnow().isoformat() + "Z"
-
-            for session_b in sessions[i+1:]:
-                start_b = session_b.get("started_at")
-                end_b = session_b.get("ended_at") or datetime.utcnow().isoformat() + "Z"
-
-                # Check overlap
-                if start_a <= end_b and start_b <= end_a:
-                    group.append(session_b["session_id"])
-
-            if len(group) > 1:
-                concurrent_groups.append(group)
-
-        return concurrent_groups

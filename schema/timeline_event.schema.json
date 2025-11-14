@@ -1,0 +1,74 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://mirrordna.org/schema/timeline_event.schema.json",
+  "title": "MirrorDNA Timeline Event",
+  "description": "Event recorded in MirrorDNA timeline for continuity tracking",
+  "version": "1.0.0",
+  "type": "object",
+  "required": ["id", "timestamp", "event_type", "actor"],
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^evt_[a-z0-9_]{16,}$",
+      "description": "Unique event identifier"
+    },
+    "timestamp": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO 8601 timestamp of event occurrence"
+    },
+    "actor": {
+      "type": "string",
+      "description": "Identity ID of actor that triggered event"
+    },
+    "event_type": {
+      "type": "string",
+      "enum": [
+        "session_start",
+        "session_end",
+        "memory_created",
+        "memory_accessed",
+        "identity_verified",
+        "vault_accessed",
+        "citation_created",
+        "citation_updated",
+        "state_snapshot",
+        "reflection_recorded",
+        "config_loaded",
+        "custom"
+      ],
+      "description": "Type of timeline event"
+    },
+    "payload": {
+      "type": "object",
+      "description": "Event-specific data payload"
+    },
+    "related_vault_id": {
+      "type": "string",
+      "pattern": "^vault_[a-z0-9_]{16,}$",
+      "description": "Related vault identifier if applicable"
+    },
+    "related_agent_id": {
+      "type": "string",
+      "description": "Related agent identifier if applicable"
+    },
+    "related_session_id": {
+      "type": "string",
+      "pattern": "^sess_[a-z0-9_]{12,}$",
+      "description": "Related session identifier if applicable"
+    },
+    "checksum": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$",
+      "description": "SHA-256 checksum of event payload"
+    },
+    "tags": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Event classification tags"
+    }
+  },
+  "additionalProperties": false
+}
