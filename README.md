@@ -192,8 +192,12 @@ MirrorDNA/
 │   ├── state_snapshot.py  # State snapshot capture
 │   └── [legacy files]     # SDK abstractions (deprecated)
 │
-├── sdk/                   # Language-specific SDKs
-│   └── javascript/        # JavaScript/TypeScript SDK
+├── sdk/                   # Developer SDKs
+│   ├── python/            # Python SDK (simple, local)
+│   ├── js/                # JavaScript SDK (simple, local)
+│   ├── javascript/        # TypeScript SDK (advanced)
+│   ├── docs/              # SDK documentation
+│   └── tests/             # SDK tests
 │
 ├── docs/                  # Protocol documentation
 │   ├── overview.md        # What and why
@@ -323,12 +327,90 @@ All tests validate protocol behavior, not implementation details.
 - Verifiable history via timeline
 - Data sovereignty (own your identity and state)
 
-## Language SDKs
+## Developer SDK
 
-- **Python** — Reference implementation in `src/mirrordna/`
-- **JavaScript/TypeScript** — SDK in `sdk/javascript/`
+Simple, local-first SDKs for learning and building with MirrorDNA.
 
-See individual SDK READMEs for language-specific documentation.
+**What the SDK does:**
+- Load and validate vault configurations
+- Compute deterministic state hashes for directories
+- Validate timeline files
+- Track continuity status locally
+
+**What the SDK does NOT do:**
+- Network operations or hosted APIs
+- Cryptographic signing
+- Production-grade features
+
+### Python SDK
+
+Quick start:
+```bash
+cd sdk/python
+python examples/basic_usage.py
+```
+
+Basic usage:
+```python
+from mirrordna_client import MirrorDNAClient
+
+client = MirrorDNAClient()
+
+# Load vault config
+vault = client.load_vault_config("vault.yaml")
+
+# Compute state hash
+state_hash = client.compute_state_hash("./vault_data")
+
+# Validate timeline
+result = client.validate_timeline("timeline.json")
+if result['valid']:
+    print(f"Timeline valid with {result['event_count']} events")
+```
+
+See [`sdk/python/README.md`](sdk/python/README.md) for details.
+
+### JavaScript SDK
+
+Quick start:
+```bash
+cd sdk/js
+node examples/basicUsage.js
+```
+
+Basic usage:
+```javascript
+const { MirrorDNAClient } = require('./mirrordnaClient.js');
+
+const client = new MirrorDNAClient();
+
+// Load vault config
+const vault = client.loadVaultConfig('vault.json');
+
+// Compute state hash
+const stateHash = client.computeStateHash('./vault_data');
+
+// Validate timeline
+const result = client.validateTimeline('timeline.json');
+if (result.valid) {
+    console.log(`Timeline valid with ${result.event_count} events`);
+}
+```
+
+See [`sdk/js/README.md`](sdk/js/README.md) for details.
+
+### SDK Documentation
+
+- **[Overview](sdk/docs/overview.md)** — What the SDK is and typical use cases
+- **[Design Principles](sdk/docs/design_principles.md)** — Local first, minimal dependencies, educational
+- **[Roadmap](sdk/docs/roadmap.md)** — Future development direction
+
+### Advanced SDKs
+
+For production features and advanced capabilities:
+
+- **Python Protocol Implementation** — Full implementation in `src/mirrordna/`
+- **TypeScript SDK** — Advanced features in `sdk/javascript/`
 
 ## License
 
