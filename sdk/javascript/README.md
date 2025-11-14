@@ -2,6 +2,28 @@
 
 Official JavaScript/TypeScript SDK for the MirrorDNA protocol.
 
+> **Note**: This SDK provides high-level abstractions built **on top of** the MirrorDNA protocol. For protocol-level primitives (Master Citations, Timeline, Checksums), see the main [MirrorDNA repository](../../README.md).
+
+## What is This SDK?
+
+This SDK provides application-layer abstractions for building MirrorDNA-compatible systems in JavaScript/TypeScript:
+
+- **IdentityManager** — High-level identity creation and management
+- **ContinuityTracker** — Session tracking and lineage
+- **MemoryManager** — Multi-tier memory system
+- **StorageAdapters** — Pluggable storage backends
+
+**Protocol Layer** (in `../../src/mirrordna/`):
+- Master Citations
+- Timeline Events
+- State Snapshots
+- Checksum Verification
+
+**SDK Layer** (this directory):
+- Application-friendly APIs
+- Storage abstractions
+- Memory management helpers
+
 ## Installation
 
 ```bash
@@ -181,6 +203,16 @@ const identity: Identity = {
 const tier: MemoryTier = 'long_term';
 ```
 
+## Protocol Integration
+
+This SDK builds on the MirrorDNA protocol. Under the hood:
+
+- **IdentityManager** creates Master Citations (protocol layer)
+- **ContinuityTracker** writes to Timeline (protocol layer)
+- **MemoryManager** captures State Snapshots (protocol layer)
+
+To work directly with protocol primitives, use the Python implementation or implement the protocol yourself following the JSON schemas.
+
 ## Building
 
 ```bash
@@ -194,9 +226,37 @@ npm run build
 npm test
 ```
 
+## Relationship to Protocol
+
+```
+┌─────────────────────────────────────┐
+│  Your Application                   │
+├─────────────────────────────────────┤
+│  JS SDK (this directory)            │  ← High-level APIs
+│  - IdentityManager                  │
+│  - ContinuityTracker                │
+│  - MemoryManager                    │
+├─────────────────────────────────────┤
+│  MirrorDNA Protocol                 │  ← Core primitives
+│  - Master Citations                 │
+│  - Timeline Events                  │
+│  - State Snapshots                  │
+│  - Checksum Verification            │
+└─────────────────────────────────────┘
+```
+
+This SDK is **one way** to use the MirrorDNA protocol. You can also:
+- Use the Python implementation directly
+- Implement the protocol in any language using the JSON schemas
+- Build your own SDK with different abstractions
+
 ## License
 
-MIT License — See LICENSE file for details.
+MIT License — See [LICENSE](../../LICENSE) for details.
+
+## Contributing
+
+See [CONTRIBUTING.md](../../CONTRIBUTING.md) for contribution guidelines.
 
 ---
 
