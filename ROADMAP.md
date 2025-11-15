@@ -90,7 +90,7 @@ The MirrorDNA protocol is **production-ready** with:
 - [ ] **Encrypted State Protocol**
   - End-to-end encrypted snapshots
   - Encrypted timeline entries
-  - Key management recommendations
+  - Key management information only
   - Zero-knowledge proofs of continuity
 
 ### 6. Interoperability Standards

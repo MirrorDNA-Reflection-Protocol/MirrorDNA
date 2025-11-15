@@ -1,8 +1,14 @@
-# MirrorDNA Protocol
+# MirrorDNA Protocol ⟡⟦CANONICAL⟧
 
 **The foundational protocol for AI identity, continuity, and state integrity**
 
+![Bound to Master Citation v15.2](https://img.shields.io/badge/Master%20Citation-v15.2-blue?style=flat-square)
+![Reflective AI Compliance](https://img.shields.io/badge/Reflective%20AI-Compliant-green?style=flat-square)
+![FEU Contract](https://img.shields.io/badge/FEU-Fact%2FEstimate%2FUnknown-orange?style=flat-square)
+
 MirrorDNA is a protocol specification defining how AI agents and users maintain verifiable, persistent identities across platforms, sessions, and time. It provides the core primitives for identity binding, continuity tracking, and cryptographic state verification.
+
+**⚖️ LEGAL NOTICE:** This is a research prototype. See [LEGAL_NOTICE.md](LEGAL_NOTICE.md) for critical disclaimers, governance, and compliance requirements.
 
 ## Protocol Status
 
@@ -15,6 +21,18 @@ MirrorDNA is now governed by **Master Citation v15.2**, defining:
 - Reflective Integrity System alignment
 
 All modules and specifications in this repo must follow v15.2 without exception.
+
+## FEU Contract (Fact/Estimate/Unknown)
+
+All MirrorDNA implementations enforce the **FEU (Fact/Estimate/Unknown) Contract**:
+
+- **FACT** — Verifiable data: checksummed states, cryptographically proven identities, validated schemas
+- **ESTIMATE** — Computed outputs: inferred states, heuristic analyses, derived metrics
+- **UNKNOWN** — Missing or indeterminate information: incomplete data, unverifiable claims, pending verification
+
+**Default classification:** Outputs without explicit FEU tagging are treated as **ESTIMATE** and require human validation before use in critical decisions.
+
+See [LEGAL_NOTICE.md](LEGAL_NOTICE.md) for full governance requirements.
 
 ## What is MirrorDNA?
 

@@ -1,3 +1,6 @@
+# FEU Enforcement: Master Citation v15.2
+# FACT/ESTIMATE/UNKNOWN tagging mandatory | Information only, non-advisory
+
 """
 MirrorDNA - Identity and Continuity Protocol
 
@@ -10,7 +13,7 @@ This package provides the core protocol implementation including:
 - State snapshot capture and serialization
 """
 
-__version__ = "1.0.0"
+__version__ = "0.2.0-hardening"
 
 from .config_loader import ConfigLoader, MasterCitation, VaultConfig
 from .checksum import (

@@ -1,3 +1,6 @@
+# FEU Enforcement: Master Citation v15.2
+# FACT/ESTIMATE/UNKNOWN tagging mandatory | Information only, non-advisory
+
 """
 Setup configuration for MirrorDNA.
 """
@@ -11,7 +14,7 @@ long_description = readme_file.read_text() if readme_file.exists() else ""
 
 setup(
     name="mirrordna",
-    version="1.0.0",
+    version="0.2.0-hardening",
     author="MirrorDNA-Reflection-Protocol",
     description="Identity and continuity protocol layer for AI agents",
     long_description=long_description,
@@ -50,6 +53,6 @@ setup(
         "Topic :: Software Development :: Libraries :: Python Modules",
         "Topic :: Scientific/Engineering :: Artificial Intelligence",
     ],
-    keywords="ai agents identity continuity memory protocol mirrordna",
+    keywords="MirrorDNA Reflective-AI ActiveMirrorOS LingOS ai agents identity continuity memory protocol",
     license="MIT",
 )

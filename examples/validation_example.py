@@ -1,3 +1,6 @@
+# FEU Enforcement: Master Citation v15.2
+# FACT/ESTIMATE/UNKNOWN tagging mandatory | Information only, non-advisory
+
 """
 Basic example: Schema validation.
 """

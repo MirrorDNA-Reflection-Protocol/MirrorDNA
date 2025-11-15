@@ -147,7 +147,7 @@ The repository now provides a complete protocol specification with:
 - Agent links (AgentDNA integration)
 - Master Citation vs Identity State distinction
 - Validation (JSON Schema enforcement)
-- Storage recommendations (YAML/JSON, naming, location)
+- Storage information only (YAML/JSON, naming, location)
 
 **✅ glossary.md** (320 lines)
 - Core terms (Master Citation, Vault, Timeline, State Snapshot, Checksum, Continuity)

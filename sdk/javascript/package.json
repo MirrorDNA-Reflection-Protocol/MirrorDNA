@@ -1,6 +1,6 @@
 {
   "name": "@mirrordna/sdk",
-  "version": "1.0.0",
+  "version": "0.2.0-hardening",
   "description": "JavaScript/TypeScript SDK for MirrorDNA protocol",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -10,7 +10,10 @@
     "prepublish": "npm run build"
   },
   "keywords": [
-    "mirrordna",
+    "MirrorDNA",
+    "Reflective-AI",
+    "ActiveMirrorOS",
+    "LingOS",
     "identity",
     "continuity",
     "memory",

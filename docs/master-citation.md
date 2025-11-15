@@ -253,7 +253,7 @@ The Master Citation is the **anchor**. The Identity State is the **current value
 
 Invalid documents raise `ValueError` with details.
 
-## Storage Recommendations
+## Storage Information
 
 **File format**: YAML (human-readable) or JSON (machine-readable)
 
