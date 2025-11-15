@@ -2,6 +2,19 @@
 
 Welcome to the MirrorDNA documentation. This index will help you find what you need quickly.
 
+## Protocol Governance
+
+**Current Master Citation:** v15.2
+**Location:** `/spec/master-citation/Master_Citation_v15.2.md`
+**VaultID:** `AMOS://MasterCitation/v15.2`
+**Checksum:** [To be generated via Vault Manager]
+
+All MirrorDNA implementations must align with Master Citation v15.2, which enforces:
+- Zero-Drift Layer (ZDL)
+- Auto-FEU [Fact/Estimate/Unknown] tagging
+- Reflective Integrity System (RIS)
+- Canonical Vault Supremacy
+
 ## Getting Started
 
 **New to MirrorDNA?** Start here:

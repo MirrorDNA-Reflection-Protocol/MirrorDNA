@@ -16,6 +16,11 @@ MirrorDNA is now governed by **Master Citation v15.2**, defining:
 
 All modules and specifications in this repo must follow v15.2 without exception.
 
+**Current Master Citation:** v15.2
+**Location:** `/spec/master-citation/Master_Citation_v15.2.md`
+**VaultID:** `AMOS://MasterCitation/v15.2`
+**Checksum:** [To be generated via Vault Manager]
+
 ## What is MirrorDNA?
 
 MirrorDNA is a **protocol**, not a platform or service. It defines data structures and verification rules that enable:
@@ -182,6 +187,14 @@ MirrorDNA/
 ├── LICENSE                # MIT License
 ├── setup.py               # Python package configuration
 ├── pytest.ini             # Test configuration
+│
+├── spec/                  # Protocol Specifications
+│   ├── master-citation/   # Master Citation canonical documents
+│   │   ├── Master_Citation_v15.2.md  # Current governing spec
+│   │   └── archive/       # Previous versions
+│   ├── protocol/          # Protocol specification documents
+│   ├── glossary/          # Protocol terminology
+│   └── validators/        # Validation rules and tools
 │
 ├── schemas/               # JSON Schema definitions
 │   ├── protocol/          # Core protocol schemas
