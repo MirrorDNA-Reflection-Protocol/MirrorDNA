@@ -72,6 +72,12 @@ Set of rights granted to an identity (e.g., right to memory, continuity, portabi
 
 **Defined in**: Master Citation `constitutional_alignment.rights_bundle`
 
+### Zero-Drift Protocol
+Canonical anti-hallucination and Vault sovereignty enforcement protocol (v1.0). Defines 4-layer drift firewall to eliminate hallucination, drift, and unverified reasoning.
+
+**Specification**: [Zero-Drift Protocol v1.0](protocols/ZeroDrift_Protocol_v1.0.md)
+**Integration**: Master Citation compliance, continuity enforcement, AHP 2.1 alignment
+
 ---
 
 ## Agent Concepts

@@ -189,13 +189,14 @@ MirrorDNA provides:
 - State integrity (checksums detect tampering)
 - Event ordering (timeline is append-only with timestamps)
 - Identity binding (Master Citation links identity to vault)
+- Anti-hallucination enforcement (via [Zero-Drift Protocol v1.0](protocols/ZeroDrift_Protocol_v1.0.md))
 
 **Weak guarantees** (require external systems):
 - Time accuracy (relies on system clocks)
 - Actor authentication (relies on identity verification)
 - Storage persistence (relies on vault backend)
 
-MirrorDNA proves **what happened** (via checksums and timeline). External systems prove **who did it** (via auth) and **when** (via trusted time).
+MirrorDNA proves **what happened** (via checksums and timeline). External systems prove **who did it** (via auth) and **when** (via trusted time). The Zero-Drift Protocol ensures no invented or unverified information enters the continuity chain.
 
 ## Best Practices
 
