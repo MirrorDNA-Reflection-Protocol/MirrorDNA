@@ -164,6 +164,8 @@ constitutional_alignment:
 
 This allows agents/platforms to verify: "Does this identity comply with constitutional requirements?"
 
+Constitutional compliance may include adherence to the [Zero-Drift Protocol v1.0](protocols/ZeroDrift_Protocol_v1.0.md) for anti-hallucination enforcement and Vault sovereignty.
+
 ## Lineage (Predecessor/Successor)
 
 Master Citations form a **linked list** via `predecessor` and `successor` fields.
