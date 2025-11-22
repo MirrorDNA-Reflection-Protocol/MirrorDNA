@@ -45,6 +45,14 @@ Welcome to the MirrorDNA documentation. This index will help you find what you n
   - Custom storage backends
   - Testing
 
+### Protocol Specifications
+
+- **[Zero-Drift Protocol v1.0](protocols/ZeroDrift_Protocol_v1.0.md)** — Anti-hallucination and Vault sovereignty enforcement
+  - Canonical governance protocol
+  - 4-layer drift firewall
+  - Master Citation integration
+  - Non-negotiable truth-state rules
+
 ## Quick Reference
 
 ### Common Tasks

@@ -284,6 +284,7 @@ All tests validate protocol behavior, not implementation details.
 4. **Storage Agnostic** — Works with filesystems, databases, S3, IPFS, git
 5. **Human Readable** — YAML/JSON formats, not binary blobs
 6. **No Central Authority** — Anyone can implement, no gatekeepers
+7. **Anti-Hallucination Governance** — [Zero-Drift Protocol v1.0](docs/protocols/ZeroDrift_Protocol_v1.0.md) enforces Vault sovereignty and prevents invented information
 
 ## MirrorDNA in the Ecosystem
 
