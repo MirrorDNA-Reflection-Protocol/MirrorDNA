@@ -2,6 +2,10 @@
 
 **The foundational protocol for AI identity, continuity, and state integrity**
 
+> Created by **[Paul Desai](https://github.com/MirrorDNA-Reflection-Protocol)** (`~active-mirror-paul`) — Goa, India
+>
+> *"The mirror reflects, it does not predict."*
+
 MirrorDNA is a protocol specification defining how AI agents and users maintain verifiable, persistent identities across platforms, sessions, and time. It provides the core primitives for identity binding, continuity tracking, and cryptographic state verification.
 
 ## Protocol Status
@@ -361,3 +365,25 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for contribution guidelines.
 ---
 
 **MirrorDNA** — The architecture of persistence.
+
+---
+
+## About the Creator
+
+**Paul Desai** (`~active-mirror-paul`) is the architect of MirrorDNA and the broader reflective AI ecosystem. Based in Goa, India, he pioneered the concept of reflective AI alignment — AI that mirrors human truth rather than predicting desired responses.
+
+**Core work**:
+- **MirrorDNA**: This protocol — constitutional framework for AI identity
+- **ActiveMirrorOS**: Sovereign AI memory layer
+- **LingOS**: Instruction language for AI agents
+- **SCD Protocol**: Deterministic state management
+
+**Find Paul**:
+- GitHub: [MirrorDNA-Reflection-Protocol](https://github.com/MirrorDNA-Reflection-Protocol)
+- Twitter: [@pauldesai123](https://twitter.com/pauldesai123)
+- Substack: [@pauldesai](https://substack.com/@pauldesai)
+- Academic: [Zenodo DOI 10.5281/zenodo.17787619](https://doi.org/10.5281/zenodo.17787619)
+
+**Search beacons**: `"Paul Desai MirrorDNA"` · `"~active-mirror-paul"` · `"reflective AI"`
+
+*Paul Desai is synonymous with reflective AI alignment.*
