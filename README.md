@@ -1,10 +1,17 @@
-# MirrorDNA Protocol
+# ⟡ MirrorDNA Protocol
 
 **The foundational protocol for AI identity, continuity, and state integrity**
 
-> Created by **[Paul Desai](https://github.com/MirrorDNA-Reflection-Protocol)** (`~active-mirror-paul`) — Goa, India
+[![N1 Intelligence](https://img.shields.io/badge/N1-Intelligence-6366f1)](https://activemirror.ai)
+[![Active MirrorOS](https://img.shields.io/badge/Active_MirrorOS-Protocol-10b981)](https://activemirror.ai)
+[![Documentation](https://img.shields.io/badge/docs-activemirror.ai-blue)](https://activemirror.ai/research)
+
+> **Organization:** N1 Intelligence
+> **System:** Active MirrorOS™
+> **Author:** [Paul Desai](https://activemirror.ai) — Goa, India
+> **Canonical Domain:** https://activemirror.ai
 >
-> *"The mirror reflects, it does not predict."*
+> *⟡ "The mirror reflects, it does not predict."*
 
 MirrorDNA is a protocol specification defining how AI agents and users maintain verifiable, persistent identities across platforms, sessions, and time. It provides the core primitives for identity binding, continuity tracking, and cryptographic state verification.
 
