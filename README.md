@@ -2,6 +2,7 @@
 
 **The foundational protocol for AI identity, continuity, and state integrity**
 
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.17787619.svg)](https://doi.org/10.5281/zenodo.17787619)
 [![N1 Intelligence](https://img.shields.io/badge/N1-Intelligence-6366f1)](https://activemirror.ai)
 [![Active MirrorOS](https://img.shields.io/badge/Active_MirrorOS-Protocol-10b981)](https://activemirror.ai)
 [![Documentation](https://img.shields.io/badge/docs-activemirror.ai-blue)](https://activemirror.ai/research)
