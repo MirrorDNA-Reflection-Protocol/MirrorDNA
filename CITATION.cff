@@ -1,0 +1,37 @@
+cff-version: 1.2.0
+title: MirrorDNA Protocol
+message: >-
+  If you use this software, please cite it using the
+  metadata from this file.
+type: software
+authors:
+  - given-names: Paul
+    family-names: Desai
+    email: paul@n1intelligence.com
+    affiliation: N1 Intelligence (OPC) Pvt Ltd
+repository-code: 'https://github.com/MirrorDNA-Reflection-Protocol/MirrorDNA'
+url: 'https://activemirror.ai'
+abstract: >-
+  MirrorDNA is the architecture of AI persistence. Reflection over prediction.
+  An open specification for AI identity, continuity, and state integrity.
+keywords:
+  - ai-memory
+  - sovereign-ai
+  - state-management
+  - llm-infrastructure
+  - reflection
+  - mirrordna
+license: MIT
+version: 1.0.0
+date-released: '2025-04-01'
+preferred-citation:
+  type: article
+  title: >-
+    Structured Contextual Distillation (SCD v3.1): A Deterministic,
+    Vendor-Independent Protocol for Persistent, Verifiable Agent State
+  authors:
+    - family-names: Desai
+      given-names: Paul
+  doi: 10.5281/zenodo.17787619
+  journal: Zenodo
+  year: 2025
