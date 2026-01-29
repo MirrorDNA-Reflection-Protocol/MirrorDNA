@@ -97,7 +97,7 @@ citation_data = {
     "id": "mc_myagent_primary_001",
     "version": "1.0.0",
     "vault_id": "vault_myagent_main",
-    "created_at": "2025-11-14T10:00:00Z",
+    "created_at": "2026-01-14T10:00:00Z",
     "constitutional_alignment": {
         "compliance_level": "full",
         "framework_version": "1.0",
