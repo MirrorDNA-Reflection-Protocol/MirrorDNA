@@ -19,14 +19,14 @@ MirrorDNA is a protocol specification defining how AI agents and users maintain 
 ## Protocol Status
 
 **Protocol Status:**
-MirrorDNA is now governed by **Master Citation v15.2**, defining:
+MirrorDNA is now governed by **Master Citation v15.3**, defining:
 
 - Zero-Drift enforcement
 - Auto-FEU [Fact/Estimate/Unknown] tagging
 - Canonical Vault Supremacy
 - Reflective Integrity System alignment
 
-All modules and specifications in this repo must follow v15.2 without exception.
+All modules and specifications in this repo must follow v15.3 without exception.
 
 ## What is MirrorDNA?
 
@@ -323,11 +323,17 @@ All tests validate protocol behavior, not implementation details.
 
 ## Related Projects
 
+- [Active Mirror](https://activemirror.ai) — Consumer product with AI Twins, BrainScan, Sovereign Mode
 - [MirrorDNA-Standard](https://github.com/MirrorDNA-Reflection-Protocol/MirrorDNA-Standard) — Constitutional framework specification
 - [ActiveMirrorOS](https://github.com/MirrorDNA-Reflection-Protocol/ActiveMirrorOS) — Product implementation using MirrorDNA
-- [AgentDNA](https://github.com/MirrorDNA-Reflection-Protocol/AgentDNA) — Agent personality protocol
+- [MirrorGate](https://github.com/MirrorDNA-Reflection-Protocol/mirrorgate) — Safety proxy and policy enforcement
+- [SCD-Protocol](https://github.com/MirrorDNA-Reflection-Protocol/SCD-Protocol) — Deterministic state management
 - [BeaconGlyphs](https://github.com/MirrorDNA-Reflection-Protocol/BeaconGlyphs) — Visual glyph system for GlyphTrail
 - [LingOS](https://github.com/MirrorDNA-Reflection-Protocol/LingOS) — Language-native reflective OS
+
+## Ecosystem
+
+**95 repositories** across **9 architectural layers**. See the [Ecosystem Map](https://mirrordna-reflection-protocol.github.io/MirrorDNA-Docs/ecosystem/).
 
 ## Use Cases
 
