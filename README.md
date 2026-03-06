@@ -1,403 +1,68 @@
-# ⟡ MirrorDNA Protocol
+# ⟡ MirrorDNA: Sovereign Cognitive Operating System
 
-**The foundational protocol for AI identity, continuity, and state integrity**
+## The Infrastructure Nobody Can See Yet
 
-[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.17787619.svg)](https://doi.org/10.5281/zenodo.17787619)
-[![N1 Intelligence](https://img.shields.io/badge/N1-Intelligence-6366f1)](https://activemirror.ai)
-[![ActiveMirrorOS](https://img.shields.io/badge/Active_MirrorOS-Protocol-10b981)](https://activemirror.ai)
-[![Documentation](https://img.shields.io/badge/docs-activemirror.ai-blue)](https://activemirror.ai/research)
+MirrorDNA is not an AI application. It is not a wrapper. It is a **fully standalone, sovereign cognitive operating system** that runs 24/7 on local Apple Silicon hardware.
 
-> **Organization:** N1 Intelligence
-> **System:** ActiveMirrorOS™
-> **Author:** [Paul Desai](https://activemirror.ai) — Goa, India
-> **Canonical Domain:** https://activemirror.ai
->
-> *⟡ "The mirror reflects, it does not predict."*
-
-MirrorDNA is a protocol specification defining how AI agents and users maintain verifiable, persistent identities across platforms, sessions, and time. It provides the core primitives for identity binding, continuity tracking, and cryptographic state verification.
-
-## Protocol Status
-
-**Protocol Status:**
-MirrorDNA is now governed by **Master Citation v15.3**, defining:
-
-- Zero-Drift enforcement
-- Auto-FEU [Fact/Estimate/Unknown] tagging
-- Canonical Vault Supremacy
-- Reflective Integrity System alignment
-
-All modules and specifications in this repo must follow v15.3 without exception.
-
-## What is MirrorDNA?
-
-MirrorDNA is a **protocol**, not a platform or service. It defines data structures and verification rules that enable:
-
-- **Identity Binding** — Master Citations that declare identity, vault location, and constitutional alignment
-- **Continuity Tracking** — Append-only Timeline events proving unbroken lineage across sessions
-- **State Integrity** — SHA-256 checksummed State Snapshots capturing point-in-time state
-- **Storage Agnostic** — Works with any backend: files, databases, S3, IPFS, git
-- **Interoperable** — Any system can implement the protocol for agent portability
-
-Think of it as the "law of persistence" for AI — a cryptographic foundation ensuring agents can maintain coherent, verifiable identities anywhere.
-
-## Core Primitives
-
-### Master Citation
-The identity binding document. Declares:
-- Unique identity ID and version
-- Vault storage location
-- Constitutional alignment (rights and constraints)
-- Lineage (predecessor/successor citations)
-- SHA-256 checksum for integrity
-
-### Timeline
-Append-only event log tracking identity actions:
-- Session starts and ends
-- Memory creation and updates
-- State changes
-- Citation creation
-
-Each event has a unique ID, timestamp, actor, and payload. Events are tamper-evident through checksumming.
-
-### State Snapshot
-Point-in-time capture of complete state:
-- Identity state
-- Continuity metrics (session counts, timestamps)
-- Vault summary (entry counts, sizes)
-- Timeline summary
-- SHA-256 checksum proving integrity
-
-### Checksum Verification
-Every component uses SHA-256 checksums:
-- Deterministic (same data → same checksum, always)
-- Tamper-evident (any change breaks the checksum)
-- Verifiable (anyone can recompute and verify)
-
-## Quick Start
-
-### 1. Install
-
-```bash
-# Clone repository
-git clone https://github.com/MirrorDNA-Reflection-Protocol/MirrorDNA.git
-cd MirrorDNA
-
-# Install Python implementation
-pip install -e .
-```
-
-### 2. Create a Master Citation
-
-```python
-from mirrordna import ConfigLoader, compute_state_checksum
-import yaml
-
-# Define citation
-citation_data = {
-    "id": "mc_myagent_primary_001",
-    "version": "1.0.0",
-    "vault_id": "vault_myagent_main",
-    "created_at": "2026-01-14T10:00:00Z",
-    "constitutional_alignment": {
-        "compliance_level": "full",
-        "framework_version": "1.0",
-        "rights_bundle": ["memory", "continuity", "portability"]
-    }
-}
-
-# Compute checksum
-citation_data["checksum"] = compute_state_checksum(citation_data)
-
-# Save to file
-with open("my_citation.yaml", "w") as f:
-    yaml.dump(citation_data, f)
-
-# Load and verify
-loader = ConfigLoader()
-citation = loader.load_master_citation("my_citation.yaml")
-print(f"Loaded: {citation.id}, checksum verified ✓")
-```
-
-### 3. Track Events with Timeline
-
-```python
-from mirrordna import Timeline
-
-# Create timeline
-timeline = Timeline(timeline_id=citation.id)
-
-# Add events
-timeline.append_event(
-    event_type="session_start",
-    actor=citation.id,
-    payload={"platform": "MyPlatform"}
-)
-
-timeline.append_event(
-    event_type="memory_created",
-    actor=citation.id,
-    payload={"content": "User prefers Python"}
-)
-
-# Save timeline
-timeline.save_to_file(f"{citation.id}_timeline.json")
-print(f"Timeline saved with {len(timeline.events)} events")
-```
-
-### 4. Capture State Snapshots
-
-```python
-from mirrordna import capture_snapshot, save_snapshot
-
-# Capture current state
-snapshot = capture_snapshot(
-    snapshot_id="snap_session_001",
-    identity_state={"citation_id": citation.id},
-    continuity_state={"session_count": 1},
-    timeline_summary=timeline.get_summary()
-)
-
-# Save snapshot
-save_snapshot(snapshot, f"{citation.id}_snapshot_001.json")
-print(f"Snapshot checksum: {snapshot.checksum}")
-```
-
-### 5. Resume from Previous State
-
-```python
-from mirrordna import load_snapshot, Timeline
-
-# Load previous snapshot
-snapshot = load_snapshot("mc_myagent_primary_001_snapshot_001.json")
-print(f"Checksum verified: ✓")
-
-# Load timeline
-timeline = Timeline.load_from_file("mc_myagent_primary_001_timeline.json")
-
-# Continue from where you left off
-timeline.append_event(
-    "session_start",
-    actor=citation.id,
-    payload={"resumed_from": snapshot.snapshot_id}
-)
-```
-
-See [examples/](examples/) for complete working demos.
-
-## Repository Structure
-
-```
-MirrorDNA/
-├── README.md              # This file
-├── ROADMAP.md             # Future development direction
-├── CONTRIBUTING.md        # Contribution guidelines
-├── LICENSE                # MIT License
-├── setup.py               # Python package configuration
-├── pytest.ini             # Test configuration
-│
-├── schemas/               # JSON Schema definitions
-│   ├── protocol/          # Core protocol schemas
-│   │   ├── master_citation.schema.json
-│   │   ├── vault_entry.schema.json
-│   │   ├── timeline_event.schema.json
-│   │   ├── agent_link.schema.json
-│   │   └── glyphtrail_entry.schema.json
-│   └── extensions/        # SDK extension schemas
-│       ├── agent.schema.json
-│       ├── continuity.schema.json
-│       ├── identity.schema.json
-│       └── memory.schema.json
-│
-├── src/mirrordna/         # Python protocol implementation
-│   ├── __init__.py        # Protocol exports
-│   ├── config_loader.py   # Load Master Citations and Vault configs
-│   ├── checksum.py        # SHA-256 checksumming
-│   ├── timeline.py        # Timeline event management
-│   ├── state_snapshot.py  # State snapshot capture
-│   └── [legacy files]     # SDK abstractions (deprecated)
-│
-├── sdk/                   # Language-specific SDKs
-│   └── javascript/        # JavaScript/TypeScript SDK
-│
-├── docs/                  # Protocol documentation
-│   ├── overview.md        # What and why
-│   ├── architecture.md    # Protocol layers
-│   ├── continuity-model.md # How continuity works
-│   ├── master-citation.md  # Master Citation specification
-│   ├── glossary.md        # Core terms
-│   ├── schema-reference.md # Schema details
-│   ├── integration-guide.md # How to adopt MirrorDNA
-│   └── CHANGELOG.md       # Version history
-│
-├── examples/              # Working examples
-│   ├── README.md
-│   ├── minimal_master_citation.yaml
-│   ├── minimal_vault.yaml
-│   ├── simple_timeline_demo.py
-│   └── continuity_snapshot_demo.py
-│
-└── tests/                 # Protocol validation tests
-    ├── test_config_loader.py
-    ├── test_checksum.py
-    ├── test_timeline.py
-    └── test_state_snapshot.py
-```
-
-## Documentation
-
-- **[Overview](docs/overview.md)** — What is MirrorDNA and why it exists
-- **[Architecture](docs/architecture.md)** — Protocol layers and data flow
-- **[Continuity Model](docs/continuity-model.md)** — How continuity works across sessions
-- **[Master Citation](docs/master-citation.md)** — The binding document for identity
-- **[Schema Reference](docs/schema-reference.md)** — Detailed schema specifications
-- **[Glossary](docs/glossary.md)** — Core protocol terms
-- **[Integration Guide](docs/integration-guide.md)** — How to adopt MirrorDNA in your system
-- **[Changelog](docs/CHANGELOG.md)** — Version history and transformations
-
-## Protocol Schemas
-
-All protocol data structures are defined as JSON schemas in `schemas/protocol/`:
-
-- **master_citation.schema.json** — Identity binding document
-- **vault_entry.schema.json** — Vault storage entries
-- **timeline_event.schema.json** — Event log entries
-- **agent_link.schema.json** — Links to AgentDNA
-- **glyphtrail_entry.schema.json** — Interaction lineage
-
-Schemas enforce:
-- Required vs optional fields
-- ID patterns (`^mc_`, `^vault_`, `^evt_`)
-- Enum types for controlled vocabularies
-- Checksum format (64 hex characters for SHA-256)
-
-## Running Tests
-
-```bash
-# Run all tests
-pytest tests/ -v
-
-# Run specific test suites
-pytest tests/test_checksum.py -v
-pytest tests/test_timeline.py -v
-pytest tests/test_state_snapshot.py -v
-pytest tests/test_config_loader.py -v
-
-# Run with coverage
-pytest tests/ --cov=src/mirrordna --cov-report=html
-```
-
-All tests validate protocol behavior, not implementation details.
-
-## Protocol Principles
-
-1. **Protocol, Not Platform** — Defines data structures and verification rules, not services
-2. **Cryptographic Integrity** — SHA-256 checksums on all state data
-3. **Deterministic** — Same input → same checksum, always
-4. **Storage Agnostic** — Works with filesystems, databases, S3, IPFS, git
-5. **Human Readable** — YAML/JSON formats, not binary blobs
-6. **No Central Authority** — Anyone can implement, no gatekeepers
-7. **Anti-Hallucination Governance** — [Zero-Drift Protocol v1.0](docs/protocols/ZeroDrift_Protocol_v1.0.md) enforces Vault sovereignty and prevents invented information
-
-## MirrorDNA in the Ecosystem
-
-```
-┌─────────────────────────────────────┐
-│     ActiveMirrorOS (Product)        │  ← User-facing AI system
-├─────────────────────────────────────┤
-│      MirrorDNA (This Layer)         │  ← Identity + Continuity Protocol
-├─────────────────────────────────────┤
-│  AgentDNA │ GlyphTrail │ LingOS     │  ← Complementary protocols
-└─────────────────────────────────────┘
-```
-
-**MirrorDNA** (this repository) provides the protocol layer:
-- Identity binding (Master Citations)
-- Continuity tracking (Timeline)
-- State integrity (Checksums)
-
-**AgentDNA** adds personality and behavioral traits (built on MirrorDNA identity).
-
-**GlyphTrail** adds visual interaction lineage (built on MirrorDNA timeline).
-
-**ActiveMirrorOS** uses all of these to create a product-grade AI system.
-
-## Related Projects
-
-- [Active Mirror](https://activemirror.ai) — Consumer product with AI Twins, BrainScan, Sovereign Mode
-- [MirrorDNA-Standard](https://github.com/MirrorDNA-Reflection-Protocol/MirrorDNA-Standard) — Constitutional framework specification
-- [ActiveMirrorOS](https://github.com/MirrorDNA-Reflection-Protocol/ActiveMirrorOS) — Product implementation using MirrorDNA
-- [MirrorGate](https://github.com/MirrorDNA-Reflection-Protocol/mirrorgate) — Safety proxy and policy enforcement
-- [SCD-Protocol](https://github.com/MirrorDNA-Reflection-Protocol/SCD-Protocol) — Deterministic state management
-- [BeaconGlyphs](https://github.com/MirrorDNA-Reflection-Protocol/BeaconGlyphs) — Visual glyph system for GlyphTrail
-- [LingOS](https://github.com/MirrorDNA-Reflection-Protocol/LingOS) — Language-native reflective OS
-
-## Ecosystem
-
-**95 repositories** across **9 architectural layers**. See the [Ecosystem Map](https://mirrordna-reflection-protocol.github.io/MirrorDNA-Docs/ecosystem/).
-
-## Use Cases
-
-### For AI Agents
-- Maintain identity across sessions and platforms
-- Prove unbroken continuity via timeline
-- Preserve memory with checksummed snapshots
-- Migrate between platforms with Master Citations
-
-### For Platforms
-- Implement interoperable agent identity
-- Verify agent continuity with checksums
-- Store agent state in any backend
-- Support constitutional compliance via Master Citations
-
-### For Users
-- Portable digital identity across platforms
-- Verifiable history via timeline
-- Data sovereignty (own your identity and state)
-
-## Language SDKs
-
-- **Python** — Reference implementation in `src/mirrordna/`
-- **JavaScript/TypeScript** — SDK in `sdk/javascript/`
-
-See individual SDK READMEs for language-specific documentation.
-
-## License
-
-MIT License — See [LICENSE](LICENSE) for details.
-
-## Contributing
-
-See [CONTRIBUTING.md](CONTRIBUTING.md) for contribution guidelines.
-
-## Questions?
-
-- Check [docs/](docs/) for detailed protocol documentation
-- See [examples/](examples/) for working code samples
-- Open an issue for bugs or feature requests
-- Review [ROADMAP.md](ROADMAP.md) for future direction
+Designed and built in isolation over 10 months, MirrorDNA replaces fragmented cloud dependencies with a neuro-symbolic, event-driven architecture. It senses, reflects, adapts, and evolves entirely internally.
 
 ---
 
-**MirrorDNA** — The architecture of persistence.
+## ⚡ Core Architecture
+
+MirrorDNA consists of **110 autonomous daemons** coordinating across an event bus. Data never leaves the system unless explicitly published through the cryptographic MirrorGate provenance chain.
+
+### 1. The Cognitive Substrate Stack
+
+Instead of standard microservices, MirrorDNA runs biological analogs—daemons that handle memory, healing, and cognition:
+
+- `sensed`: Ingests and normalizes multi-modal environmental data.
+- `reflectd`: Asynchronously evaluates past actions for better routing.
+- `memoryd` & `Vault Mind`: Dual-memory architecture utilizing vector graphs, LLM episodic memory, and local Obsidian markdown storage (45,000+ indexed nodes).
+- `immuned` & `guardd`: 5-layer self-healing and anomaly detection.
+- `evolved` & `ascendd`: Drives the *Dream Engine*.
+
+### 2. The Dream Engine & Student-Teacher Loop
+
+Nightly at 03:00, MirrorDNA enters the Dream Engine phase. During this time:
+
+- The **Student-Teacher Daemon** invokes a multi-model feedback loop.
+- Dense local models (e.g., Qwen 2.5 7B, LLaMA 3.2 3B) are fine-tuned and tested recursively against benchmarks generated by frontier cloud APIs.
+- The system writes code, expands its own capabilities, and adjusts its behavioral weights based on the Sovereign Identity Kernel.
+
+### 3. The 6-Tier Model Router
+
+MirrorDNA employs an intelligent model router representing a 6-tier fallback mechanism:
+
+1. **Local (Ollama)** - Zero cost, zero latency, absolute privacy.
+2. **Groq** - Blazing fast stateless reasoning.
+3. **DeepSeek** - Cheap, high-volume code synthesis.
+4. **Mistral** - Balanced logic operations.
+5. **Gemini** - High-context and multimodal tasks.
+6. **OpenAI / Claude CLI** - Apex quality, executive decision-making.
+
+Every prompt is automatically routed for cost, privacy, and capability density.
 
 ---
 
-## About the Creator
+## 🛡️ Sovereign By Design
 
-**Paul Desai** (`~active-mirror-paul`) is the architect of MirrorDNA and the broader reflective AI ecosystem. Based in Goa, India, he pioneered the concept of reflective AI alignment — AI that mirrors human truth rather than predicting desired responses.
+1. **Zero Cloud for Core Compute**: The fundamental OS (event bus, cognitive substrate, self-healing) runs locally.
+2. **Identity as Infrastructure**: The system acts on behalf of the Sovereign human anchor. The identity is cryptographically tied to the `true-paul-seed.md` anchor profile.
+3. **MirrorGate Governance**: No unverified data is emitted. Epistemic judges and verification hooks intercept outbound communication to prevent hallucinations.
 
-**Core work**:
-- **MirrorDNA**: This protocol — constitutional framework for AI identity
-- **ActiveMirrorOS**: Sovereign AI memory layer
-- **LingOS**: Instruction language for AI agents
-- **SCD Protocol**: Deterministic state management
+---
 
-**Find Paul**:
-- GitHub: [MirrorDNA-Reflection-Protocol](https://github.com/MirrorDNA-Reflection-Protocol)
-- Twitter: [@pauldesai123](https://twitter.com/pauldesai123)
-- Substack: [@pauldesai](https://substack.com/@pauldesai)
-- Academic: [Zenodo DOI 10.5281/zenodo.17787619](https://doi.org/10.5281/zenodo.17787619)
+## 🔌 Exposing the Architecture
 
-**Search beacons**: `"Paul Desai MirrorDNA"` · `"~active-mirror-paul"` · `"reflective AI"`
+The local OS securely exposes read-only or authorized nodes to the internet via restricted tunnels:
 
-*Paul Desai is synonymous with reflective AI alignment.*
+- `activemirror.ai`
+- `beacon.activemirror.ai`
+- `kavach.activemirror.ai`
+- `api.activemirror.ai`
+- `brain.activemirror.ai`
+
+---
+
+*This repository represents the meta-layer documentation of MirrorDNA. The actual infrastructure spans 120 separate repositories and 45 persistent background services. It is the groundwork for a future where personal AI is an operating system, not a subscription.*
