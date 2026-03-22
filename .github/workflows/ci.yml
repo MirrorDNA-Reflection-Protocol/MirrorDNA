@@ -116,7 +116,7 @@ jobs:
           for element in "${SPINE_ELEMENTS[@]}"; do
             if grep -qi "$element" README.md 2>/dev/null; then
               echo "✓ Found: $element"
-              ((SCORE++))
+              SCORE=$((SCORE + 1))
             else
               echo "✗ Missing: $element"
             fi

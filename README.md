@@ -66,3 +66,7 @@ The local OS securely exposes read-only or authorized nodes to the internet via 
 ---
 
 *This repository represents the meta-layer documentation of MirrorDNA. The actual infrastructure spans 120 separate repositories and 45 persistent background services. It is the groundwork for a future where personal AI is an operating system, not a subscription.*
+
+---
+
+Built by [Paul Desai](https://activemirror.ai) as part of the Active MirrorOS ecosystem — a product of N1 Intelligence.
